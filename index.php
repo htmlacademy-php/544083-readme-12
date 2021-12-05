@@ -2,6 +2,51 @@
 $is_auth = rand(0, 1);
 
 $user_name = 'Alexandr';
+
+$post_types = [
+  'quote' => 'post-quote',
+  'text' => 'post-text',
+  'photo' => 'post-photo',
+  'link' => 'post-link'
+];
+
+$popular_posts = [
+  [
+    'title' => 'Цитата',
+    'type' => $post_types['quote'],
+    'content' => 'Мы в жизни любим только раз, а после ищем лишь похожих',
+    'author' => 'Лариса',
+    'avatar' => 'userpic-larisa-small.jpg'
+  ],
+  [
+    'title' => 'Игра престолов',
+    'type' => $post_types['text'],
+    'content' => 'Не могу дождаться начала финального сезона своего любимого сериала!',
+    'author' => 'Владик',
+    'avatar' => 'userpic.jpg'
+  ],
+  [
+    'title' => 'Наконец, обработал фотки!',
+    'type' => $post_types['photo'],
+    'content' => 'rock-medium.jpg',
+    'author' => 'Виктор',
+    'avatar' => 'userpic-mark.jpg'
+  ],
+  [
+    'title' => 'Моя мечта',
+    'type' => $post_types['photo'],
+    'content' => 'coast-medium.jpg',
+    'author' => 'Лариса',
+    'avatar' => 'userpic-larisa-small.jpg'
+  ],
+  [
+    'title' => 'Лучшие курсы',
+    'type' => $post_types['link'],
+    'content' => 'www.htmlacademy.ru',
+    'author' => 'Владик',
+    'avatar' => 'userpic.jpg'
+  ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -154,9 +199,9 @@ $user_name = 'Alexandr';
                        alt="Аватар профиля">
                 </div>
                 <div class="header__profile-name">
-                                <span>
-                                    <?= $user_name ?>
-                                </span>
+                  <span>
+                    <?= $user_name ?>
+                  </span>
                   <svg class="header__link-arrow" width="10" height="6">
                     <use xlink:href="#icon-arrow-right-ad"></use>
                   </svg>
@@ -289,99 +334,98 @@ $user_name = 'Alexandr';
         </ul>
       </div>
     </div>
-    <div class="popular__posts">
-      <div class="visually-hidden" id="donor">
-        <!--содержимое для поста-цитаты-->
-        <blockquote>
-          <p>
-            <!--здесь текст-->
-          </p>
-          <cite>Неизвестный Автор</cite>
-        </blockquote>
+    <?php if (isset($popular_posts)): ?>
+      <div class="popular__posts">
+        <?php foreach ($popular_posts as $post): ?>
+          <?php
+            $title = $post['title'] ?? '';
+            $type = $post['type'] ?? '';
+            $content = $post['content'] ?? '';
+            $avatar = $post['avatar'];
+            $author = $post['author'] ?? '';
+          ?>
 
-        <!--содержимое для поста-ссылки-->
-        <div class="post-link__wrapper">
-          <a class="post-link__external" href="http://" title="Перейти по ссылке">
-            <div class="post-link__info-wrapper">
-              <div class="post-link__icon-wrapper">
-                <img src="https://www.google.com/s2/favicons?domain=vitadental.ru" alt="Иконка">
+          <article class="popular__post post <?= $type ?>">
+            <header class="post__header">
+              <h2>
+                <?= $title ?>
+              </h2>
+            </header>
+            <?php if ($type): ?>
+              <div class="post__main">
+                <?php if ($type === $post_types['text']): ?>
+                  <p><?= $content ?></p>
+                <?php endif; ?>
+
+                <?php if ($type === $post_types['quote']): ?>
+                  <blockquote>
+                    <p><?= $content ?></p>
+                    <cite><?= $author ?></cite>
+                  </blockquote>
+                <?php endif; ?>
+
+                <?php if ($type === $post_types['photo']): ?>
+                  <div class="post-photo__image-wrapper">
+                    <img src="img/<?= $content ?>" alt="Фото от пользователя <?= $author ?>" width="360" height="240">
+                  </div>
+                <?php endif; ?>
+
+                <?php if ($type === $post_types['link']): ?>
+                  <div class="post-link__wrapper">
+                    <a class="post-link__external" href="<?= $content ?>" title="Перейти по ссылке">
+                      <div class="post-link__info-wrapper">
+                        <div class="post-link__icon-wrapper">
+                          <img src="https://www.google.com/s2/favicons?domain=vitadental.ru" alt="Иконка">
+                        </div>
+                        <div class="post-link__info">
+                          <h3><?= $title ?></h3>
+                        </div>
+                      </div>
+                      <span><?= $content ?></span>
+                    </a>
+                  </div>
+                <?php endif; ?>
               </div>
-              <div class="post-link__info">
-                <h3><!--здесь заголовок--></h3>
+            <?php endif; ?>
+            <footer class="post__footer">
+              <div class="post__author">
+                <a class="post__author-link" href="#" title="Автор">
+                  <div class="post__avatar-wrapper">
+                    <img class="post__author-avatar" src="img/<?= $avatar ?>" alt="Аватар пользователя <?= $author ?>">
+                  </div>
+                  <div class="post__info">
+                    <b class="post__author-name"><?= $author ?></b>
+                    <time class="post__time" datetime="">дата</time>
+                  </div>
+                </a>
               </div>
-            </div>
-            <span><!--здесь ссылка--></span>
-          </a>
-        </div>
-
-        <!--содержимое для поста-фото-->
-        <div class="post-photo__image-wrapper">
-          <img src="img/" alt="Фото от пользователя" width="360" height="240">
-        </div>
-
-        <!--содержимое для поста-видео-->
-        <div class="post-video__block">
-          <div class="post-video__preview">
-            <?= embed_youtube_cover(/* вставьте ссылку на видео */); ?>
-            <img src="img/coast-medium.jpg" alt="Превью к видео" width="360" height="188">
-          </div>
-          <a href="post-details.html" class="post-video__play-big button">
-            <svg class="post-video__play-big-icon" width="14" height="14">
-              <use xlink:href="#icon-video-play-big"></use>
-            </svg>
-            <span class="visually-hidden">Запустить проигрыватель</span>
-          </a>
-        </div>
-
-        <!--содержимое для поста-текста-->
-        <p><!--здесь текст--></p>
+              <div class="post__indicators">
+                <div class="post__buttons">
+                  <a class="post__indicator post__indicator--likes button" href="#" title="Лайк">
+                    <svg class="post__indicator-icon" width="20" height="17">
+                      <use xlink:href="#icon-heart"></use>
+                    </svg>
+                    <svg class="post__indicator-icon post__indicator-icon--like-active" width="20"
+                         height="17">
+                      <use xlink:href="#icon-heart-active"></use>
+                    </svg>
+                    <span>0</span>
+                    <span class="visually-hidden">количество лайков</span>
+                  </a>
+                  <a class="post__indicator post__indicator--comments button" href="#" title="Комментарии">
+                    <svg class="post__indicator-icon" width="19" height="17">
+                      <use xlink:href="#icon-comment"></use>
+                    </svg>
+                    <span>0</span>
+                    <span class="visually-hidden">количество комментариев</span>
+                  </a>
+                </div>
+              </div>
+            </footer>
+          </article>
+        <?php endforeach; ?>
       </div>
-
-      <article class="popular__post post">
-        <header class="post__header">
-          <h2><!--здесь заголовок--></h2>
-        </header>
-        <div class="post__main">
-          <!--здесь содержимое карточки-->
-        </div>
-        <footer class="post__footer">
-          <div class="post__author">
-            <a class="post__author-link" href="#" title="Автор">
-              <div class="post__avatar-wrapper">
-                <!--укажите путь к файлу аватара-->
-                <img class="post__author-avatar" src="img/" alt="Аватар пользователя">
-              </div>
-              <div class="post__info">
-                <b class="post__author-name"><!--здесь имя пользоателя--></b>
-                <time class="post__time" datetime="">дата</time>
-              </div>
-            </a>
-          </div>
-          <div class="post__indicators">
-            <div class="post__buttons">
-              <a class="post__indicator post__indicator--likes button" href="#" title="Лайк">
-                <svg class="post__indicator-icon" width="20" height="17">
-                  <use xlink:href="#icon-heart"></use>
-                </svg>
-                <svg class="post__indicator-icon post__indicator-icon--like-active" width="20"
-                     height="17">
-                  <use xlink:href="#icon-heart-active"></use>
-                </svg>
-                <span>0</span>
-                <span class="visually-hidden">количество лайков</span>
-              </a>
-              <a class="post__indicator post__indicator--comments button" href="#" title="Комментарии">
-                <svg class="post__indicator-icon" width="19" height="17">
-                  <use xlink:href="#icon-comment"></use>
-                </svg>
-                <span>0</span>
-                <span class="visually-hidden">количество комментариев</span>
-              </a>
-            </div>
-          </div>
-        </footer>
-      </article>
-    </div>
+    <?php endif; ?>
   </div>
 </section>
 
