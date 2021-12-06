@@ -341,7 +341,7 @@ $popular_posts = [
             $title = $post['title'] ?? '';
             $type = $post['type'] ?? '';
             $content = $post['content'] ?? '';
-            $avatar = $post['avatar'];
+            $avatar = $post['avatar'] ?? '';
             $author = $post['author'] ?? '';
           ?>
 
@@ -355,22 +355,16 @@ $popular_posts = [
               <div class="post__main">
                 <?php if ($type === $post_types['text']): ?>
                   <p><?= $content ?></p>
-                <?php endif; ?>
-
-                <?php if ($type === $post_types['quote']): ?>
+                <?php elseif ($type === $post_types['quote']): ?>
                   <blockquote>
                     <p><?= $content ?></p>
                     <cite><?= $author ?></cite>
                   </blockquote>
-                <?php endif; ?>
-
-                <?php if ($type === $post_types['photo']): ?>
+                <?php elseif ($type === $post_types['photo']): ?>
                   <div class="post-photo__image-wrapper">
                     <img src="img/<?= $content ?>" alt="Фото от пользователя <?= $author ?>" width="360" height="240">
                   </div>
-                <?php endif; ?>
-
-                <?php if ($type === $post_types['link']): ?>
+                <?php elseif ($type === $post_types['link']): ?>
                   <div class="post-link__wrapper">
                     <a class="post-link__external" href="<?= $content ?>" title="Перейти по ссылке">
                       <div class="post-link__info-wrapper">
