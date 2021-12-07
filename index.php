@@ -47,7 +47,38 @@ $popular_posts = [
     'avatar' => 'userpic.jpg'
   ],
 ];
+
+function cropping_text (string $str, int $limit = 300, string $subStr = '...'): array
+{
+  $str = explode(' ', $str);
+  $croppingStr = [];
+  $isLimited = true;
+
+  if (strlen($str[0]) > $limit) {
+    $croppingStr = [substr($str[0], 0, $limit)];
+    $isLimited = false;
+  } else {
+    $strLength = 0;
+
+    foreach ($str as $item) {
+      $strLength += strlen($item);
+
+      if ($strLength <= $limit) {
+        array_push($croppingStr, $item);
+      } else {
+        $isLimited = false;
+        break;
+      }
+    };
+  }
+
+  return [
+    'str' => implode(' ', $croppingStr) . ($isLimited ? '' : $subStr),
+    'isLimited' => $isLimited,
+  ];
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -354,7 +385,11 @@ $popular_posts = [
             <?php if ($type): ?>
               <div class="post__main">
                 <?php if ($type === $post_types['text']): ?>
-                  <p><?= $content ?></p>
+                  <?php $content = cropping_text($content); ?>
+                  <p><?= $content['str'] ?></p>
+                  <?php if (!$content['isLimited']):  ?>
+                    <a class="post-text__more-link" href="#">Читать далее</a>
+                  <?php endif; ?>
                 <?php elseif ($type === $post_types['quote']): ?>
                   <blockquote>
                     <p><?= $content ?></p>
