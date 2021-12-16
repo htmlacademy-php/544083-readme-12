@@ -262,3 +262,39 @@ function generate_random_date($index)
 
     return $dt;
 }
+
+/**
+ * @param $str
+ * @param int $limit
+ * @param string $subStr
+ * @return array
+ */
+function cropping_text($str, int $limit = 300, string $subStr = '...'): array
+{
+  $str = explode(' ', $str);
+  $croppingStr = [];
+  $isLimited = true;
+
+  if (strlen($str[0]) > $limit) {
+    $croppingStr = [substr($str[0], 0, $limit)];
+    $isLimited = false;
+  } else {
+    $strLength = 0;
+
+    foreach ($str as $item) {
+      $strLength += strlen($item);
+
+      if ($strLength <= $limit) {
+        array_push($croppingStr, $item);
+      } else {
+        $isLimited = false;
+        break;
+      }
+    };
+  }
+
+  return [
+    'str' => implode(' ', $croppingStr) . ($isLimited ? '' : $subStr),
+    'isLimited' => $isLimited,
+  ];
+}
