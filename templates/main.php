@@ -84,15 +84,15 @@
       </ul>
     </div>
   </div>
-  <?php if (isset($popular_posts)): ?>
+  <?php if (!empty($popular_posts)): ?>
     <div class="popular__posts">
       <?php foreach ($popular_posts as $post): ?>
         <?php
-        $title = $post['title'] ?? '';
+        $title = htmlspecialchars($post['title']) ?? '';
         $type = $post['type'] ?? '';
-        $content = $post['content'] ?? '';
-        $avatar = $post['avatar'] ?? '';
-        $author = $post['author'] ?? '';
+        $content = htmlspecialchars($post['content']) ?? '';
+        $avatar = htmlspecialchars($post['avatar']) ?? '';
+        $author = htmlspecialchars($post['author']) ?? '';
         ?>
 
         <article class="popular__post post <?= $type ?>">
