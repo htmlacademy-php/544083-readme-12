@@ -85,14 +85,61 @@
     </div>
   </div>
   <?php if (!empty($popular_posts)): ?>
+    <?php
+      $current_time = time();
+      function time_difference ($time): string {
+        $minute = 60;
+        $hour = $minute * 60;
+        $day = $hour * 24;
+        $week = $day * 7;
+        $five_week = $week * 5;
+
+        switch ($time) {
+          case $time >= $five_week:
+            $relative_time = $time / $five_week;
+            $string_one = 'месяц';
+            $string_two = 'месяца';
+            $string_many = 'месяцев';
+            break;
+          case $time >= $week && $time < $five_week:
+            $relative_time = $time / $week;
+            $string_one = 'неделю';
+            $string_two = 'недели';
+            $string_many = 'недель';
+            break;
+          case $time >= $day && $time < $week:
+            $relative_time = $time / $day;
+            $string_one = 'день';
+            $string_two = 'дня';
+            $string_many = 'дней';
+            break;
+          case $time >= $hour && $time < $day:
+            $relative_time = $time / $hour;
+            $string_one = 'час';
+            $string_two = 'часа';
+            $string_many = 'часов';
+            break;
+          default:
+            $relative_time = $time / $minute;
+            $string_one = 'минуту';
+            $string_two = 'минуты';
+            $string_many = 'минут';
+        }
+
+        $relative_time = floor($relative_time);
+
+        return sprintf('%s %s назад', $relative_time, get_noun_plural_form($relative_time, $string_one, $string_two, $string_many));
+      };
+    ?>
     <div class="popular__posts">
-      <?php foreach ($popular_posts as $post): ?>
+      <?php foreach ($popular_posts as $key => $post): ?>
         <?php
-        $title = htmlspecialchars($post['title']) ?? '';
-        $type = $post['type'] ?? '';
-        $content = htmlspecialchars($post['content']) ?? '';
-        $avatar = htmlspecialchars($post['avatar']) ?? '';
-        $author = htmlspecialchars($post['author']) ?? '';
+          $title = htmlspecialchars($post['title']) ?? '';
+          $type = $post['type'] ?? '';
+          $content = htmlspecialchars($post['content']) ?? '';
+          $avatar = htmlspecialchars($post['avatar']) ?? '';
+          $author = htmlspecialchars($post['author']) ?? '';
+          $time = generate_random_date($key);
         ?>
 
         <article class="popular__post post <?= $type ?>">
@@ -137,13 +184,19 @@
           <?php endif; ?>
           <footer class="post__footer">
             <div class="post__author">
-              <a class="post__author-link" href="#" title="Автор">
+              <a class="post__author-link" href="#" title="<?= $author ?>">
                 <div class="post__avatar-wrapper">
                   <img class="post__author-avatar" src="img/<?= $avatar ?>" alt="Аватар пользователя <?= $author ?>">
                 </div>
                 <div class="post__info">
                   <b class="post__author-name"><?= $author ?></b>
-                  <time class="post__time" datetime="">дата</time>
+                  <time
+                    class="post__time"
+                    datetime="<?= $time ?>"
+                    title="<?= date_format(date_create($time), 'd.m.Y H:m'); ?>"
+                  >
+                    <?= time_difference($current_time - strtotime($time)); ?>
+                  </time>
                 </div>
               </a>
             </div>
