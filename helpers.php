@@ -298,3 +298,51 @@ function cropping_text($str, int $limit = 300, string $subStr = '...'): array
     'isLimited' => $isLimited,
   ];
 }
+
+/**
+ * @param int $time
+ * @return string
+ */
+function relative_time (int $time): string {
+  $minute = 60;
+  $hour = $minute * 60;
+  $day = $hour * 24;
+  $week = $day * 7;
+  $five_week = $week * 5;
+
+  switch ($time) {
+    case $time >= $five_week:
+      $relative_time = $time / $five_week;
+      $string_one = 'месяц';
+      $string_two = 'месяца';
+      $string_many = 'месяцев';
+      break;
+    case $time >= $week && $time < $five_week:
+      $relative_time = $time / $week;
+      $string_one = 'неделю';
+      $string_two = 'недели';
+      $string_many = 'недель';
+      break;
+    case $time >= $day && $time < $week:
+      $relative_time = $time / $day;
+      $string_one = 'день';
+      $string_two = 'дня';
+      $string_many = 'дней';
+      break;
+    case $time >= $hour && $time < $day:
+      $relative_time = $time / $hour;
+      $string_one = 'час';
+      $string_two = 'часа';
+      $string_many = 'часов';
+      break;
+    default:
+      $relative_time = $time / $minute;
+      $string_one = 'минуту';
+      $string_two = 'минуты';
+      $string_many = 'минут';
+  }
+
+  $relative_time = floor($relative_time);
+
+  return sprintf('%s %s назад', $relative_time, get_noun_plural_form($relative_time, $string_one, $string_two, $string_many));
+};
