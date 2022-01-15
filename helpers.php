@@ -310,36 +310,31 @@ function relative_time (int $time): string {
   $week = $day * 7;
   $five_week = $week * 5;
 
-  switch ($time) {
-    case $time >= $five_week:
-      $relative_time = $time / $five_week;
-      $string_one = 'месяц';
-      $string_two = 'месяца';
-      $string_many = 'месяцев';
-      break;
-    case $time >= $week && $time < $five_week:
-      $relative_time = $time / $week;
-      $string_one = 'неделю';
-      $string_two = 'недели';
-      $string_many = 'недель';
-      break;
-    case $time >= $day && $time < $week:
-      $relative_time = $time / $day;
-      $string_one = 'день';
-      $string_two = 'дня';
-      $string_many = 'дней';
-      break;
-    case $time >= $hour && $time < $day:
-      $relative_time = $time / $hour;
-      $string_one = 'час';
-      $string_two = 'часа';
-      $string_many = 'часов';
-      break;
-    default:
-      $relative_time = $time / $minute;
-      $string_one = 'минуту';
-      $string_two = 'минуты';
-      $string_many = 'минут';
+  if ($time >= $five_week) {
+    $relative_time = $time / $five_week;
+    $string_one = 'месяц';
+    $string_two = 'месяца';
+    $string_many = 'месяцев';
+  } elseif ($time >= $week && $time < $five_week) {
+    $relative_time = $time / $five_week;
+    $string_one = 'месяц';
+    $string_two = 'месяца';
+    $string_many = 'месяцев';
+  } elseif ($time >= $day && $time < $week) {
+    $relative_time = $time / $day;
+    $string_one = 'день';
+    $string_two = 'дня';
+    $string_many = 'дней';
+  } elseif ($time >= $hour && $time < $day) {
+    $relative_time = $time / $hour;
+    $string_one = 'час';
+    $string_two = 'часа';
+    $string_many = 'часов';
+  } else {
+    $relative_time = $time / $minute;
+    $string_one = 'минуту';
+    $string_two = 'минуты';
+    $string_many = 'минут';
   }
 
   $relative_time = floor($relative_time);
