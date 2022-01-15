@@ -85,14 +85,16 @@
     </div>
   </div>
   <?php if (!empty($popular_posts)): ?>
+    <?php $current_time = time(); ?>
     <div class="popular__posts">
-      <?php foreach ($popular_posts as $post): ?>
+      <?php foreach ($popular_posts as $key => $post): ?>
         <?php
-        $title = htmlspecialchars($post['title']) ?? '';
-        $type = $post['type'] ?? '';
-        $content = htmlspecialchars($post['content']) ?? '';
-        $avatar = htmlspecialchars($post['avatar']) ?? '';
-        $author = htmlspecialchars($post['author']) ?? '';
+          $title = htmlspecialchars($post['title']) ?? '';
+          $type = $post['type'] ?? '';
+          $content = htmlspecialchars($post['content']) ?? '';
+          $avatar = htmlspecialchars($post['avatar']) ?? '';
+          $author = htmlspecialchars($post['author']) ?? '';
+          $time = generate_random_date($key);
         ?>
 
         <article class="popular__post post <?= $type ?>">
@@ -137,13 +139,19 @@
           <?php endif; ?>
           <footer class="post__footer">
             <div class="post__author">
-              <a class="post__author-link" href="#" title="Автор">
+              <a class="post__author-link" href="#" title="<?= $author ?>">
                 <div class="post__avatar-wrapper">
                   <img class="post__author-avatar" src="img/<?= $avatar ?>" alt="Аватар пользователя <?= $author ?>">
                 </div>
                 <div class="post__info">
                   <b class="post__author-name"><?= $author ?></b>
-                  <time class="post__time" datetime="">дата</time>
+                  <time
+                    class="post__time"
+                    datetime="<?= $time ?>"
+                    title="<?= date_format(date_create($time), 'd.m.Y H:m'); ?>"
+                  >
+                    <?= relative_time($current_time - strtotime($time)); ?>
+                  </time>
                 </div>
               </a>
             </div>
