@@ -49,9 +49,9 @@ CREATE INDEX post_text_ix ON posts(text(255));
 CREATE INDEX quote_author_ix ON posts(quote_author);
 
 CREATE TABLE posts_by_hashtags (
-    id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL REFERENCES posts(id),
-    hash_tag_id INT NOT NULL REFERENCES hashtags(id)
+    hash_tag_id INT NOT NULL REFERENCES hashtags(id),
+    PRIMARY KEY (post_id, hash_tag_id)
 );
 
 CREATE TABLE comments (
@@ -63,15 +63,15 @@ CREATE TABLE comments (
 );
 
 CREATE TABLE likes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id),
-    post_id INT NOT NULL REFERENCES posts(id)
+    post_id INT NOT NULL REFERENCES posts(id),
+    PRIMARY KEY (user_id, post_id)
 );
 
 CREATE TABLE subscriptions (
-   id INT AUTO_INCREMENT PRIMARY KEY,
    following_id INT NOT NULL REFERENCES users(id),
-   follower_id INT NOT NULL REFERENCES users(id)
+   follower_id INT NOT NULL REFERENCES users(id),
+   PRIMARY KEY (following_id, follower_id)
 );
 
 CREATE TABLE messages (
