@@ -8,7 +8,7 @@ CREATE TABLE users (
    id INT AUTO_INCREMENT PRIMARY KEY,
    email VARCHAR (128) NOT NULL UNIQUE,
    password CHAR (64) NOT NULL,
-   avatar VARCHAR (255),
+   avatar VARCHAR (255) NULL,
    dt_add TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -25,7 +25,7 @@ CREATE UNIQUE INDEX class_name_ix ON post_types(class_name);
 
 CREATE TABLE hashtags (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR (64)
+    name VARCHAR (64) NOT NULL UNIQUE
 );
 
 CREATE UNIQUE INDEX hashtag_name_ix ON hashtags(name);
@@ -34,14 +34,13 @@ CREATE TABLE posts (
    id INT AUTO_INCREMENT PRIMARY KEY,
    author_id INT NOT NULL REFERENCES users(id),
    title VARCHAR (128) NOT NULL,
-   text TEXT,
-   image VARCHAR (255),
-   video VARCHAR (255),
-   link VARCHAR (255),
-   views INT,
-   quote_author VARCHAR (128),
+   text TEXT NULL,
+   image VARCHAR (255) NULL,
+   video VARCHAR (255) NULL,
+   link VARCHAR (255) NULL,
+   views INT NULL,
+   quote_author VARCHAR (128) NULL,
    type_id INT NOT NULL REFERENCES post_types(id),
-   hashtags TEXT,
    dt_add TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -50,26 +49,27 @@ CREATE INDEX post_text_ix ON posts(text(255));
 CREATE INDEX quote_author_ix ON posts(quote_author);
 
 CREATE TABLE posts_by_hashtags (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT NOT NULL REFERENCES posts(id),
     hash_tag_id INT NOT NULL REFERENCES hashtags(id)
 );
 
 CREATE TABLE comments (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    content VARCHAR (255) NOT NULL,
+    content TEXT NOT NULL,
     dt_add TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     author_id INT NOT NULL REFERENCES users(id),
     post_id INT NOT NULL REFERENCES posts(id)
 );
 
-CREATE INDEX content_ix ON comments(content);
-
 CREATE TABLE likes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id),
     post_id INT NOT NULL REFERENCES posts(id)
 );
 
 CREATE TABLE subscriptions (
+   id INT AUTO_INCREMENT PRIMARY KEY,
    following_id INT NOT NULL REFERENCES users(id),
    follower_id INT NOT NULL REFERENCES users(id)
 );
