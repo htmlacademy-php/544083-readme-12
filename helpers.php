@@ -316,10 +316,10 @@ function relative_time (int $time): string {
     $string_two = 'месяца';
     $string_many = 'месяцев';
   } elseif ($time >= $week && $time < $five_week) {
-    $relative_time = $time / $five_week;
-    $string_one = 'месяц';
-    $string_two = 'месяца';
-    $string_many = 'месяцев';
+    $relative_time = $time / $week;
+    $string_one = 'неделю';
+    $string_two = 'недели';
+    $string_many = 'недель';
   } elseif ($time >= $day && $time < $week) {
     $relative_time = $time / $day;
     $string_one = 'день';
