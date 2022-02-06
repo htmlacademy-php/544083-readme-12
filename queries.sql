@@ -38,19 +38,16 @@ VALUES
     ('коммент к посту 10', 3, 5);
 
 /* Получение списка постов с сортировкой по популярности и вместе с именами авторов и типом контента */
-SELECT p.id, type_id, views, login FROM posts p
-JOIN users u ON author_id = u.id
+SELECT p.id, p.type_id, p.views, u.login FROM posts p
+JOIN users u ON p.author_id = u.id
 ORDER BY views DESC;
 
 /* получение список постов для конкретного пользователя */
 SELECT id FROM posts WHERE author_id = 1;
 
-/* получение списка постов для конкретного пользователя */
-SELECT id FROM posts WHERE author_id = 1;
-
 /* получение списка комментариев для одного поста, в комментариях должен быть логин пользователя */
-SELECT c.id, login FROM comments c
-JOIN users u ON author_id = u.id
+SELECT c.id, u.login FROM comments c
+JOIN users u ON c.author_id = u.id
 WHERE post_id = 1;
 
 /* добавиление лайка к посту */
