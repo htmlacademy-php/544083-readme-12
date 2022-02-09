@@ -29,11 +29,10 @@ else {
 
   $sql_posts =
     "
-      SELECT p.title, p.text, p.quote_author, p.link, p.image, pt.class_name, pt.name AS type, u.login AS author, u.avatar FROM posts p
+      SELECT p.title, p.text, p.quote_author, p.link, p.image, pt.type, u.login AS author, u.avatar FROM posts p
       JOIN users u ON p.author_id = u.id
       JOIN post_types pt ON pt.id = p.type_id
       ORDER BY views DESC
-      LIMIT 6
     ";
 
   $result_posts = mysqli_query($con, $sql_posts);

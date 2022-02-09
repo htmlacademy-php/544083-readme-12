@@ -42,22 +42,22 @@
           </a>
         </li>
         <?php if (!empty($post_types)): ?>
-          <?php foreach ($post_types as $type): ?>
+          <?php foreach ($post_types as $post_type): ?>
             <?php
-              $name = $type['name'] ?? false;
-              $class_name = $type['class_name'] ?? false;
+              $type = $post_type['type'] ?? false;
+              $name = $post_type['name'] ?? false;
             ?>
-            <?php if ($name && $class_name): ?>
+            <?php if ($type && $name): ?>
               <li class="popular__filters-item filters__item">
                 <a
-                  class="filters__button button filters__button--<?= $class_name ?>"
+                  class="filters__button button filters__button--<?= $type ?>"
                   href="#"
                 >
                   <span class="visually-hidden">
                     <?= $name ?>
                   </span>
                   <svg class="filters__icon" width="22" height="18">
-                    <use xlink:href="#icon-filter-<?= $class_name ?>"></use>
+                    <use xlink:href="#icon-filter-<?= $type ?>"></use>
                   </svg>
                 </a>
               </li>
@@ -74,7 +74,6 @@
         <?php
           $title = htmlspecialchars($post['title']) ?? '';
           $type = $post['type'] ?? '';
-          $class_name = $post['class_name'] ?? '';
           $text = htmlspecialchars($post['text']) ?? '';
           $quote_author = htmlspecialchars($post['quote_author']) ?? '';
           $link = htmlspecialchars($post['link']) ?? '';
@@ -84,7 +83,7 @@
           $time = generate_random_date($key);
         ?>
 
-        <article class="popular__post post post-<?= $class_name ?>">
+        <article class="popular__post post post-<?= $type ?>">
           <header class="post__header">
             <h2>
               <?= $title ?>
@@ -92,22 +91,22 @@
           </header>
           <?php if ($type && isset($post_types)): ?>
             <div class="post__main">
-              <?php if ($type === 'Текст'): ?>
+              <?php if ($type === 'text'): ?>
                 <?php $text = cropping_text($text); ?>
                 <p><?= $text['str'] ?></p>
                 <?php if (!$text['isLimited']):  ?>
                   <a class="post-text__more-link" href="#">Читать далее</a>
                 <?php endif; ?>
-              <?php elseif ($type === 'Цитата'): ?>
+              <?php elseif ($type === 'quote'): ?>
                 <blockquote>
                   <p><?= $text ?></p>
                   <cite><?= $quote_author ?></cite>
                 </blockquote>
-              <?php elseif ($type === 'Фото'): ?>
+              <?php elseif ($type === 'photo'): ?>
                 <div class="post-photo__image-wrapper">
                   <img src="img/<?= $image ?>" alt="Фото от пользователя <?= $author ?>" width="360" height="240">
                 </div>
-              <?php elseif ($type === 'Ссылка'): ?>
+              <?php elseif ($type === 'link'): ?>
                 <div class="post-link__wrapper">
                   <a class="post-link__external" href="<?= $link ?>" title="Перейти по ссылке">
                     <div class="post-link__info-wrapper">
