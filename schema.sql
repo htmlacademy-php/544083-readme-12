@@ -17,12 +17,12 @@ CREATE UNIQUE INDEX email_ix ON users(email);
 
 CREATE TABLE post_types (
    id INT AUTO_INCREMENT PRIMARY KEY,
-   name VARCHAR (64) NOT NULL UNIQUE,
-   class_name VARCHAR (64) NOT NULL UNIQUE
+   type VARCHAR (64) NOT NULL UNIQUE,
+   name VARCHAR (64) NOT NULL UNIQUE
 );
 
-CREATE UNIQUE INDEX post_type_ix ON post_types(name);
-CREATE UNIQUE INDEX class_name_ix ON post_types(class_name);
+CREATE UNIQUE INDEX post_type_ix ON post_types(type);
+CREATE UNIQUE INDEX post_name_ix ON post_types(name);
 
 CREATE TABLE hashtags (
     id INT AUTO_INCREMENT PRIMARY KEY,

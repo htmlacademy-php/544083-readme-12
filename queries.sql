@@ -6,13 +6,13 @@ VALUES
    ('email_3@mail.ru', 'Владик', 'password_3', 'userpic-mark.jpg');
 
 /* Добавление типов постов */
-INSERT INTO post_types (name, class_name)
+INSERT INTO post_types (type, name)
 VALUES
-    ('quote', 'post-quote'),
-    ('text', 'post-text'),
-    ('photo', 'post-photo'),
-    ('link', 'post-link'),
-    ('video', 'post-video');
+    ('quote', 'Цитата'),
+    ('text', 'Текст'),
+    ('photo', 'Фото'),
+    ('link', 'Ссылка'),
+    ('video', 'Видео');
 
 /* Добавление постов */
 INSERT INTO posts (author_id, title, type_id, views, text, quote_author, image, link)

@@ -8,50 +8,42 @@ $is_auth = rand(0, 1);
 
 $user_name = 'Alexandr';
 
-$post_types = [
-  'quote' => 'post-quote',
-  'text' => 'post-text',
-  'photo' => 'post-photo',
-  'link' => 'post-link'
-];
+$con = mysqli_connect("localhost", "root", "","readme");
 
-$popular_posts = [
-  [
-    'title' => 'Цитата',
-    'type' => $post_types['quote'],
-    'content' => 'Мы в жизни любим только раз, а после ищем лишь похожих',
-    'author' => 'Лариса',
-    'avatar' => 'userpic-larisa-small.jpg'
-  ],
-  [
-    'title' => 'Игра престолов',
-    'type' => $post_types['text'],
-    'content' => 'Не могу дождаться начала финального сезона своего любимого сериала!',
-    'author' => 'Владик',
-    'avatar' => 'userpic.jpg'
-  ],
-  [
-    'title' => 'Наконец, обработал фотки!',
-    'type' => $post_types['photo'],
-    'content' => 'rock-medium.jpg',
-    'author' => 'Виктор',
-    'avatar' => 'userpic-mark.jpg'
-  ],
-  [
-    'title' => 'Моя мечта',
-    'type' => $post_types['photo'],
-    'content' => 'coast-medium.jpg',
-    'author' => 'Лариса',
-    'avatar' => 'userpic-larisa-small.jpg'
-  ],
-  [
-    'title' => 'Лучшие курсы',
-    'type' => $post_types['link'],
-    'content' => 'www.htmlacademy.ru',
-    'author' => 'Владик',
-    'avatar' => 'userpic.jpg'
-  ],
-];
+if ($con === false) {
+  print("Ошибка подключения: " . mysqli_connect_error());
+  die;
+}
+else {
+  mysqli_set_charset($con, "utf8");
+
+  $sql_post_types = "SELECT * FROM post_types";
+  $result_post_types = mysqli_query($con, $sql_post_types);
+
+  if (!$result_post_types) {
+    print("Ошибка MySQL: " . mysqli_error($con));
+    die;
+  } else {
+    $post_types = mysqli_fetch_all($result_post_types, MYSQLI_ASSOC);
+  }
+
+  $sql_posts =
+    "
+      SELECT p.title, p.text, p.quote_author, p.link, p.image, pt.type, u.login AS author, u.avatar FROM posts p
+      JOIN users u ON p.author_id = u.id
+      JOIN post_types pt ON pt.id = p.type_id
+      ORDER BY views DESC
+    ";
+
+  $result_posts = mysqli_query($con, $sql_posts);
+
+  if (!$result_posts) {
+    print("Ошибка MySQL: " . mysqli_error($con));
+    die;
+  } else {
+    $popular_posts = mysqli_fetch_all($result_posts, MYSQLI_ASSOC);
+  }
+}
 
 $page_content = include_template('main.php', [
   'title' => 'readme: популярное',
