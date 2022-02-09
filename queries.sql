@@ -8,11 +8,11 @@ VALUES
 /* Добавление типов постов */
 INSERT INTO post_types (name, class_name)
 VALUES
-    ('quote', 'post-quote'),
-    ('text', 'post-text'),
-    ('photo', 'post-photo'),
-    ('link', 'post-link'),
-    ('video', 'post-video');
+    ('Цитата', 'quote'),
+    ('Текст', 'text'),
+    ('Фото', 'photo'),
+    ('Ссылка', 'link'),
+    ('Видео', 'video');
 
 /* Добавление постов */
 INSERT INTO posts (author_id, title, type_id, views, text, quote_author, image, link)

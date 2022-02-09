@@ -41,46 +41,29 @@
             <span>Все</span>
           </a>
         </li>
-        <li class="popular__filters-item filters__item">
-          <a class="filters__button filters__button--photo button" href="#">
-            <span class="visually-hidden">Фото</span>
-            <svg class="filters__icon" width="22" height="18">
-              <use xlink:href="#icon-filter-photo"></use>
-            </svg>
-          </a>
-        </li>
-        <li class="popular__filters-item filters__item">
-          <a class="filters__button filters__button--video button" href="#">
-            <span class="visually-hidden">Видео</span>
-            <svg class="filters__icon" width="24" height="16">
-              <use xlink:href="#icon-filter-video"></use>
-            </svg>
-          </a>
-        </li>
-        <li class="popular__filters-item filters__item">
-          <a class="filters__button filters__button--text button" href="#">
-            <span class="visually-hidden">Текст</span>
-            <svg class="filters__icon" width="20" height="21">
-              <use xlink:href="#icon-filter-text"></use>
-            </svg>
-          </a>
-        </li>
-        <li class="popular__filters-item filters__item">
-          <a class="filters__button filters__button--quote button" href="#">
-            <span class="visually-hidden">Цитата</span>
-            <svg class="filters__icon" width="21" height="20">
-              <use xlink:href="#icon-filter-quote"></use>
-            </svg>
-          </a>
-        </li>
-        <li class="popular__filters-item filters__item">
-          <a class="filters__button filters__button--link button" href="#">
-            <span class="visually-hidden">Ссылка</span>
-            <svg class="filters__icon" width="21" height="18">
-              <use xlink:href="#icon-filter-link"></use>
-            </svg>
-          </a>
-        </li>
+        <?php if (!empty($post_types)): ?>
+          <?php foreach ($post_types as $type): ?>
+            <?php
+              $name = $type['name'] ?? false;
+              $class_name = $type['class_name'] ?? false;
+            ?>
+            <?php if ($name && $class_name): ?>
+              <li class="popular__filters-item filters__item">
+                <a
+                  class="filters__button button filters__button--<?= $class_name ?>"
+                  href="#"
+                >
+                  <span class="visually-hidden">
+                    <?= $name ?>
+                  </span>
+                  <svg class="filters__icon" width="22" height="18">
+                    <use xlink:href="#icon-filter-<?= $class_name ?>"></use>
+                  </svg>
+                </a>
+              </li>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        <?php endif; ?>
       </ul>
     </div>
   </div>
@@ -91,13 +74,17 @@
         <?php
           $title = htmlspecialchars($post['title']) ?? '';
           $type = $post['type'] ?? '';
-          $content = htmlspecialchars($post['content']) ?? '';
+          $class_name = $post['class_name'] ?? '';
+          $text = htmlspecialchars($post['text']) ?? '';
+          $quote_author = htmlspecialchars($post['quote_author']) ?? '';
+          $link = htmlspecialchars($post['link']) ?? '';
+          $image = htmlspecialchars($post['image']) ?? '';
           $avatar = htmlspecialchars($post['avatar']) ?? '';
           $author = htmlspecialchars($post['author']) ?? '';
           $time = generate_random_date($key);
         ?>
 
-        <article class="popular__post post <?= $type ?>">
+        <article class="popular__post post post-<?= $class_name ?>">
           <header class="post__header">
             <h2>
               <?= $title ?>
@@ -105,24 +92,24 @@
           </header>
           <?php if ($type && isset($post_types)): ?>
             <div class="post__main">
-              <?php if ($type === $post_types['text']): ?>
-                <?php $content = cropping_text($content); ?>
-                <p><?= $content['str'] ?></p>
-                <?php if (!$content['isLimited']):  ?>
+              <?php if ($type === 'Текст'): ?>
+                <?php $text = cropping_text($text); ?>
+                <p><?= $text['str'] ?></p>
+                <?php if (!$text['isLimited']):  ?>
                   <a class="post-text__more-link" href="#">Читать далее</a>
                 <?php endif; ?>
-              <?php elseif ($type === $post_types['quote']): ?>
+              <?php elseif ($type === 'Цитата'): ?>
                 <blockquote>
-                  <p><?= $content ?></p>
-                  <cite><?= $author ?></cite>
+                  <p><?= $text ?></p>
+                  <cite><?= $quote_author ?></cite>
                 </blockquote>
-              <?php elseif ($type === $post_types['photo']): ?>
+              <?php elseif ($type === 'Фото'): ?>
                 <div class="post-photo__image-wrapper">
-                  <img src="img/<?= $content ?>" alt="Фото от пользователя <?= $author ?>" width="360" height="240">
+                  <img src="img/<?= $image ?>" alt="Фото от пользователя <?= $author ?>" width="360" height="240">
                 </div>
-              <?php elseif ($type === $post_types['link']): ?>
+              <?php elseif ($type === 'Ссылка'): ?>
                 <div class="post-link__wrapper">
-                  <a class="post-link__external" href="<?= $content ?>" title="Перейти по ссылке">
+                  <a class="post-link__external" href="<?= $link ?>" title="Перейти по ссылке">
                     <div class="post-link__info-wrapper">
                       <div class="post-link__icon-wrapper">
                         <img src="https://www.google.com/s2/favicons?domain=vitadental.ru" alt="Иконка">
@@ -131,7 +118,7 @@
                         <h3><?= $title ?></h3>
                       </div>
                     </div>
-                    <span><?= $content ?></span>
+                    <span><?= $link ?></span>
                   </a>
                 </div>
               <?php endif; ?>
