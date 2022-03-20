@@ -30,13 +30,20 @@ function is_date_valid(string $date): bool
  *
  * @return mysqli_stmt Подготовленное выражение
  */
-function db_get_prepare_stmt($link, $sql, $data = [])
+function db_get_prepare_stmt($link, $sql, $data = [], $isDebugging = false)
 {
     $stmt = mysqli_prepare($link, $sql);
 
+    $layout_404 = include_template('404.php');
+
     if ($stmt === false) {
+      if ($isDebugging) {
         $errorMsg = 'Не удалось инициализировать подготовленное выражение: ' . mysqli_error($link);
         die($errorMsg);
+      } else {
+        print($layout_404);
+        die;
+      }
     }
 
     if ($data) {
@@ -70,8 +77,13 @@ function db_get_prepare_stmt($link, $sql, $data = [])
         $func(...$values);
 
         if (mysqli_errno($link) > 0) {
+          if ($isDebugging) {
             $errorMsg = 'Не удалось связать подготовленное выражение с параметрами: ' . mysqli_error($link);
             die($errorMsg);
+          } else {
+            print($layout_404);
+            die;
+          }
         }
     }
 
@@ -339,5 +351,5 @@ function relative_time (int $time): string {
 
   $relative_time = floor($relative_time);
 
-  return sprintf('%s %s назад', $relative_time, get_noun_plural_form($relative_time, $string_one, $string_two, $string_many));
+  return sprintf('%s %s', $relative_time, get_noun_plural_form($relative_time, $string_one, $string_two, $string_many));
 };
