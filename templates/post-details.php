@@ -190,21 +190,21 @@ $user = $user ?? [];
           </div>
           <div class="post-details__rating user__rating">
             <p class="post-details__rating-item user__rating-item user__rating-item--subscribers">
-              <?php $followers = $user['followers'] ?? 0 ?>
+              <?php $followers_count = $user['followers_count'] ?? 0 ?>
               <span class="post-details__rating-amount user__rating-amount">
-                <?= $followers ?>
+                <?= $followers_count ?>
               </span>
               <span class="post-details__rating-text user__rating-text">
-                <?= get_noun_plural_form($followers, 'подписчик', 'подписчика', 'подписчиков') ?>
+                <?= get_noun_plural_form($followers_count, 'подписчик', 'подписчика', 'подписчиков') ?>
               </span>
             </p>
             <p class="post-details__rating-item user__rating-item user__rating-item--publications">
-              <?php $posts = $user['posts'] ?? 0 ?>
+              <?php $posts_count = $user['posts_count'] ?? 0 ?>
               <span class="post-details__rating-amount user__rating-amount">
-                <?= $user['posts'] ?>
+                <?= $user['posts_count'] ?>
               </span>
               <span class="post-details__rating-text user__rating-text">
-                <?= get_noun_plural_form($posts, 'публикация', 'публикации', 'публикаций') ?>
+                <?= get_noun_plural_form($posts_count, 'публикация', 'публикации', 'публикаций') ?>
               </span>
             </p>
           </div>

@@ -28,22 +28,19 @@ function is_date_valid(string $date): bool
  * @param $sql string SQL запрос с плейсхолдерами вместо значений
  * @param array $data Данные для вставки на место плейсхолдеров
  *
- * @return mysqli_stmt Подготовленное выражение
+ * @return mysqli_stmt | false (mysqli_stmt - Подготовленное выражение)
  */
 function db_get_prepare_stmt($link, $sql, $data = [], $isDebugging = false)
 {
     $stmt = mysqli_prepare($link, $sql);
 
-    $layout_404 = include_template('404.php');
-
     if ($stmt === false) {
-      if ($isDebugging) {
-        $errorMsg = 'Не удалось инициализировать подготовленное выражение: ' . mysqli_error($link);
-        die($errorMsg);
-      } else {
-        print($layout_404);
-        die;
-      }
+        if ($isDebugging) {
+            $errorMsg = 'Не удалось инициализировать подготовленное выражение: ' . mysqli_error($link);
+            die($errorMsg);
+        }
+
+        return false;
     }
 
     if ($data) {
@@ -77,17 +74,42 @@ function db_get_prepare_stmt($link, $sql, $data = [], $isDebugging = false)
         $func(...$values);
 
         if (mysqli_errno($link) > 0) {
-          if ($isDebugging) {
-            $errorMsg = 'Не удалось связать подготовленное выражение с параметрами: ' . mysqli_error($link);
-            die($errorMsg);
-          } else {
-            print($layout_404);
-            die;
-          }
+            if ($isDebugging) {
+                $errorMsg = 'Не удалось связать подготовленное выражение с параметрами: ' . mysqli_error($link);
+                die($errorMsg);
+            }
+
+            return false;
         }
     }
 
     return $stmt;
+}
+
+/**
+ * Выбирает все строки из результирующего набора и помещает их в ассоциативный массив, обычный массив или в оба
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $stmt mysqli_stmt Подготовленное выражение
+ * @param $isDebugging boolean
+ *
+ * @return array | boolean
+ */
+function db_get_fetch_all($link, $stmt, $mode = MYSQLI_ASSOC, $isDebugging = false)
+{
+    if ($stmt === false) {
+        if ($isDebugging) {
+          $errorMsg = 'Не удалось инициализировать подготовленное выражение: ' . mysqli_error($link);
+          die($errorMsg);
+        }
+
+        return false;
+    }
+
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_all($result, $mode);
 }
 
 /**
@@ -353,3 +375,13 @@ function relative_time (int $time): string {
 
   return sprintf('%s %s', $relative_time, get_noun_plural_form($relative_time, $string_one, $string_two, $string_many));
 };
+
+/**
+ * @param $isCorrect
+ */
+function include_not_found_page($isCorrect) {
+  if ($isCorrect === false) {
+    print(include_template('404.php'));
+    die;
+  }
+}
