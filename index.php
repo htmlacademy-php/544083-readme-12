@@ -1,6 +1,7 @@
 <?php
 
 require_once('helpers.php');
+require_once('db_helpers.php');
 
 date_default_timezone_set('Europe/Moscow');
 
@@ -14,41 +15,29 @@ if ($con === false) {
   print("Ошибка подключения: " . mysqli_connect_error());
   die;
 }
-else {
-  mysqli_set_charset($con, "utf8");
 
-  $sql_post_types = "SELECT * FROM post_types";
-  $result_post_types = mysqli_query($con, $sql_post_types);
+mysqli_set_charset($con, "utf8");
 
-  if (!$result_post_types) {
-    print("Ошибка MySQL: " . mysqli_error($con));
-    die;
-  } else {
-    $post_types = mysqli_fetch_all($result_post_types, MYSQLI_ASSOC);
-  }
+$post_types = db_get_post_types($con);
 
-  $sql_posts =
-    "
-      SELECT p.title, p.text, p.quote_author, p.link, p.image, pt.type, u.login AS author, u.avatar FROM posts p
-      JOIN users u ON p.author_id = u.id
-      JOIN post_types pt ON pt.id = p.type_id
-      ORDER BY views DESC
-    ";
+include_not_found_page(boolval($post_types));
 
-  $result_posts = mysqli_query($con, $sql_posts);
+$all_tab = 'all';
+$tab = $_GET['tab'] ?? $all_tab;
+$is_all_tab = $tab === $all_tab;
 
-  if (!$result_posts) {
-    print("Ошибка MySQL: " . mysqli_error($con));
-    die;
-  } else {
-    $popular_posts = mysqli_fetch_all($result_posts, MYSQLI_ASSOC);
-  }
-}
+$sort = $_GET['sort'] ?? 'views';
+
+$posts = db_get_posts($con, $tab, $is_all_tab, $sort);
+
+include_not_found_page(boolval($posts));
 
 $page_content = include_template('main.php', [
-  'title' => 'readme: популярное',
   'post_types' => $post_types,
-  'popular_posts' => $popular_posts,
+  'posts' => $posts,
+  'tab' => $tab,
+  'sort' => $sort,
+  'is_all_tab' => $is_all_tab,
 ]);
 
 $layout_content = include_template('layout.php', [
