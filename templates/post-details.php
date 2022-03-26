@@ -69,7 +69,7 @@ $user = $user ?? [];
                   <use xlink:href="#icon-heart-active"></use>
                 </svg>
                 <span>
-                  <?= $post['likes'] ?? '' ?>
+                  <?= $post['likes_count'] ?? '' ?>
                 </span>
                 <span class="visually-hidden">количество лайков</span>
               </a>
@@ -78,7 +78,7 @@ $user = $user ?? [];
                   <use xlink:href="#icon-comment"></use>
                 </svg>
                 <span>
-                  <?= $post['comments'] ?? '' ?>
+                  <?= $post['comments_count'] ?? '' ?>
                 </span>
                 <span class="visually-hidden">количество комментариев</span>
               </a>
