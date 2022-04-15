@@ -206,3 +206,67 @@ function db_get_user (mysqli $link, int $id)
 
   return db_get_fetch_all($link, $stmt)[0] ?? false;
 }
+
+/**
+ * Добавляет пост, возвращает id поста
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $post_type_id int
+ *
+ * @return int
+ */
+function db_add_post (mysqli $link, int $post_type_id): int
+{
+  $content = '';
+  $columns = ['author_id', 'type_id', 'title'];
+  switch ($_POST['type']) {
+    case 'text':
+      array_push($columns, 'text');
+      $content = sprintf("'%s'", mysqli_real_escape_string($link, $_POST['post-text']));
+      break;
+    case 'quote':
+      array_push($columns, 'text', 'quote_author');
+      $content = sprintf("'%s', '%s'", mysqli_real_escape_string($link, $_POST['cite-text']), mysqli_real_escape_string($link, $_POST['quote-author']));
+      break;
+    case 'photo':
+      array_push($columns, 'image');
+      if (isset($_FILES['post-photo']) && boolval($_FILES['post-photo']['name'])) {
+        $content = sprintf("'%s'", $_FILES['post-photo']['name']);
+      } else {
+        $content = sprintf("'%s'", basename($_POST['photo-url']));
+      }
+      break;
+    case 'link':
+      array_push($columns, 'link');
+      $content = sprintf("'%s'", $_POST['post-link']);
+      break;
+    case 'video':
+      array_push($columns, 'video');
+      $content = sprintf("'%s'", $_POST['video-url']);
+      break;
+  }
+  $columns = implode(',', $columns);
+  $title = sprintf("'%s'", mysqli_real_escape_string($link, $_POST['post-title']));
+  $sql = "INSERT INTO posts ($columns) VALUES (1, $post_type_id, $title, $content)";
+  $result = mysqli_query($link, $sql);
+  include_not_found_page(boolval($result));
+
+  $post_id = mysqli_insert_id($link);
+
+  if (!empty($_POST['hash-tags'])) {
+    $tags = explode(' ', $_POST['hash-tags']);
+    foreach ($tags as $tag) {
+      $tag = mysqli_real_escape_string($link, $tag);
+      $sql_ht = "REPLACE INTO hashtags (name) VALUES ('$tag')";
+      $result_ht = mysqli_query($link, $sql_ht);
+      include_not_found_page(boolval($result_ht));
+      $id_ht = mysqli_insert_id($link);
+
+      $sql_post_by_ht = "INSERT INTO posts_by_hashtags (post_id, hash_tag_id) VALUES ($post_id, $id_ht)";
+      $result_post_by_ht = mysqli_query($link, $sql_post_by_ht);
+      include_not_found_page(boolval($result_post_by_ht));
+    }
+  }
+
+  return $post_id;
+}

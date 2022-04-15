@@ -188,7 +188,7 @@
               </div>
             </li>
             <li>
-              <a class="header__post-button button button--transparent" href="adding-post.html">Пост</a>
+              <a class="header__post-button button button--transparent" href="/add.php">Пост</a>
             </li>
           </ul>
         </nav>
@@ -255,8 +255,9 @@
     </div>
   </div>
 </footer>
-<script src="libs/dropzone.js"></script>
-<script src="js/dropzone-settings.js"></script>
-<script src="js/main.js"></script>
+<!-- Error js see https://htmlacademy-php.slack.com/archives/C0107N6HW7R/p1617822793005500 -->
+<!--<script src="libs/dropzone.js"></script>-->
+<!--<script src="js/dropzone-settings.js"></script>-->
+<!--<script src="js/main.js"></script>-->
 </body>
 </html>

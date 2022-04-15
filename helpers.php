@@ -294,3 +294,14 @@ function include_not_found_page($isCorrect) {
     die;
   }
 }
+
+/**
+ * @param boolean $condition
+ * @param string $class
+ *
+ * @return string
+ */
+function add_class (bool $condition, string $class): string
+{
+  return $condition ? " $class" : '';
+}

@@ -14,7 +14,7 @@ if ($con === false) {
 mysqli_set_charset($con, "utf8");
 
 $id = $_GET['id'] ?? '';
-include_not_found_page(is_int($id));
+include_not_found_page(boolval($id));
 
 $post = db_get_post($con, $id);
 include_not_found_page(boolval($post));
