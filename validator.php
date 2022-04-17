@@ -3,16 +3,15 @@
 /**
  * Валидирует текстовое поле
  *
- * @param $name
+ * @param string $field
  * @param string $label
  * @param bool $is_required
  * @param int $min
  * @param int $max
- * @return array | false
+ * @return ?array
  */
-function validate_text_field ($name, string $label = '', bool $is_required = false, int $min = 0, int $max = 0)
+function validate_text_field (string $field, string $label = '', bool $is_required = false, int $min = 0, int $max = 0): ?array
 {
-  $field = $_POST[$name] ?? false;
   if ($is_required && empty($field)) {
     return [
       'label' => $label,
@@ -45,18 +44,18 @@ function validate_text_field ($name, string $label = '', bool $is_required = fal
     }
   }
 
-  return false;
+  return null;
 };
 
 /**
  * Валидирует поле с хеш тегами
  *
- * @param $name
+ * @param string $field
  * @param string $label
- * @return array | false
+ * @return ?array
  */
-function validate_hash_tags ($name, string $label) {
-  $field = $_POST[$name];
+function validate_hash_tags (string $field, string $label): ?array
+{
   $limit = 64;
 
   if (!empty($field)) {
@@ -79,20 +78,19 @@ function validate_hash_tags ($name, string $label) {
     }
   }
 
-  return false;
+  return null;
 };
 
 /**
  * Валидирует поле загрузки изображения
  *
- * @param $name
+ * @param array $file
  * @param string $label
- * @return array | false
+ * @return ?array
  */
-function validate_photo($name, string $label)
+function validate_photo(array $file, string $label): ?array
 {
-  $file = $_FILES[$name];
-  if (!empty($file)) {
+  if (!empty($file) && boolval($file['name'])) {
     if (!in_array($file['type'], ['image/png', 'image/jpeg', 'image/gif'])) {
       return [
         'error' => 'Тип файла должен соответствовать одному из форматов "png", "jpeg", "gif"',
@@ -122,20 +120,18 @@ function validate_photo($name, string $label)
     }
   }
 
-  return false;
+  return null;
 }
 
 /**
  * Валидирует поле с ссылкой на изображние
  *
- * @param $name
+ * @param string $field
  * @param string $label
- * @return array | false
+ * @return ?array
  */
-function validate_photo_link($name, string $label)
+function validate_photo_link(string $field, string $label): ?array
 {
-  $field = $_POST[$name];
-
   if (!empty($field)) {
     if (!filter_var($field, FILTER_VALIDATE_URL)) {
       return [
@@ -151,7 +147,7 @@ function validate_photo_link($name, string $label)
       ];
     }
 
-    if (file_exists(__DIR__ . '/uploads/' . basename($field))) {
+    if (file_exists(__DIR__ . '/img/' . basename($field))) {
       return [
         'error' => 'Изображение с таким названием уже существует, измените название или загрузите другую картинку',
         'label' => $label
@@ -159,20 +155,18 @@ function validate_photo_link($name, string $label)
     }
   }
 
-  return false;
+  return null;
 }
 
 /**
  * Валидирует поле с ссылкой на видео
  *
- * @param $name
+ * @param string $field
  * @param string $label
- * @return array | false
+ * @return ?array
  */
-function validate_video_link($name, string $label)
+function validate_video_link(string $field, string $label): ?array
 {
-  $field = $_POST[$name];
-
   if (empty($field)) {
     return [
       'error' => 'Это поле должно быть заполнено',
@@ -194,40 +188,30 @@ function validate_video_link($name, string $label)
     ];
   }
 
-  return false;
+  return null;
 }
 
 /**
- * Возвращиет ошибки формы добавление пост
+ * Возвращиет ошибки формы добавление поста
+ * @param array $post
+ * @param array $files
  *
  * @return array
  */
-function get_errors_post_form (): array
+function get_errors_post_form (array $post, array $files): array
 {
   $errors = [];
 
   $rules = [
-    'post-title' => function() {
-      return validate_text_field('post-title', 'Заголовок', true, 0, 128);
-    },
-    'cite-text' => function() {
-      return validate_text_field('cite-text', 'Текст цитаты', true, 0, 70);
-    },
-    'post-text' => function() {
-      return validate_text_field('post-text', 'Текст поста', true);
-    },
-    'quote-author' => function() {
-      return validate_text_field('quote-author', 'Автор', true, 0, 50);
-    },
-    'hash-tags' => function() {
-      return validate_hash_tags('hash-tags', 'Теги');
-    },
-    'video-url' => function() {
-      return validate_video_link('video-url', 'Ссылка YOUTUBE');
-    },
+    'post-title' => fn() => validate_text_field($post['post-title'], 'Заголовок', true, 0, 128),
+    'cite-text' => fn() => validate_text_field($post['cite-text'], 'Текст цитаты', true, 0, 70),
+    'post-text' => fn() => validate_text_field($post['post-text'], 'Текст поста', true),
+    'quote-author' => fn() => validate_text_field($post['quote-author'], 'Автор', true, 0, 50),
+    'hash-tags' => fn() => validate_hash_tags($post['hash-tags'], 'Теги'),
+    'video-url' => fn() => validate_video_link($post['video-url'], 'Ссылка YOUTUBE'),
   ];
 
-  foreach ($_POST as $key => $field) {
+  foreach ($post as $key => $field) {
     if (isset($rules[$key])) {
       $errors[$key] = $rules[$key]();
     }
@@ -235,29 +219,16 @@ function get_errors_post_form (): array
 
   $errors = array_filter($errors);
 
-  if ($_POST['type'] === 'photo') {
-    if (isset($_FILES['post-photo']) && boolval($_FILES['post-photo']['name'])) {
-      $error = validate_photo('post-photo', 'Фото');
-      if ($error !== false) {
+  if ($post['type'] === 'photo') {
+    if (isset($files['post-photo']) && boolval($files['post-photo']['name'])) {
+      $error = validate_photo($files['post-photo'], 'Фото');
+      if ($error !== null) {
         $errors['post-photo'] = $error;
-      } elseif(count($errors) === 0) {
-        move_uploaded_file($_FILES['post-photo']['tmp_name'], __DIR__ . '/img/' . $_FILES['post-photo']['name']);
       }
-    } elseif (!empty($_POST['photo-url'])) {
-      $error = validate_photo_link('photo-url', 'Ссылка из интернета');
-      if ($error !== false) {
+    } elseif (!empty($post['photo-url'])) {
+      $error = validate_photo_link($post['photo-url'], 'Ссылка из интернета');
+      if ($error !== null) {
         $errors['photo-url'] = $error;
-      } else {
-        $field = $_POST['photo-url'];
-        $downloadFile = file_get_contents($field);
-        if (!$downloadFile) {
-          $errors['photo-url'] = [
-            'error' => 'Не удалось скачать файл',
-            'label' => 'Ссылка',
-          ];
-        } elseif(count($errors) === 0) {
-          file_put_contents(__DIR__ . '/img/' . basename($field), $downloadFile);
-        }
       }
     } else {
       $errors['empty-photo'] = [

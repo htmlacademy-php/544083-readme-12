@@ -13,7 +13,7 @@ $values = $values ?? [];
           'error' => $errors['post-title'] ?? '',
           'value' => $values['post-title'] ?? '',
         ])) ?>
-        <div class="adding-post__input-wrapper form__input-wrapper<?= add_class(!empty($errors['photo-url']), 'form__input-section--error') ?>">
+        <div class="adding-post__input-wrapper form__input-wrapper<?= add_class(!empty($errors['photo-url']) || !empty($errors['empty-photo']), 'form__input-section--error') ?>">
           <label class="adding-post__label form__label" for="photo-url">Ссылка из интернета</label>
           <div class="form__input-section">
             <input
@@ -25,7 +25,7 @@ $values = $values ?? [];
               placeholder="Введите ссылку"
             >
             <?php print(include_template('components/adding-post/form/components/form-error.php', [
-              'error' => $errors['photo-url'] ?? '',
+              'error' => $errors['photo-url'] ?? $errors['empty-photo'] ?? '',
             ])); ?>
           </div>
         </div>

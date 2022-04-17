@@ -7,8 +7,9 @@ $errors = $errors ?? [];
     <b class="form__invalid-slogan">Пожалуйста, исправьте следующие ошибки:</b>
     <ul class="form__invalid-list">
       <?php foreach ($errors as $error): ?>
-        <li class="form__invalid-item" >
-          <?= sprintf('%s. %s', $error['label'] ?? '', $error['error'] ?? '') ?>
+        <li class="form__invalid-item">
+          <?= $error['label'] ?? '' ? $error['label'] . '. ' : '' ?>
+          <?= $error['error'] ?? '' ?>
         </li>
       <?php endforeach; ?>
     </ul>
