@@ -207,12 +207,12 @@ function generate_random_date($index)
 }
 
 /**
- * @param $str
+ * @param string $str
  * @param int $limit
  * @param string $subStr
  * @return array
  */
-function cropping_text($str, int $limit = 300, string $subStr = '...'): array
+function cropping_text(string $str, int $limit = 300, string $subStr = '...'): array
 {
   $str = explode(' ', $str);
   $croppingStr = [];
@@ -246,7 +246,7 @@ function cropping_text($str, int $limit = 300, string $subStr = '...'): array
  * @param int $time
  * @return string
  */
-function relative_time (int $time): string {
+function relative_time(int $time): string {
   $minute = 60;
   $hour = $minute * 60;
   $day = $hour * 24;
@@ -288,9 +288,67 @@ function relative_time (int $time): string {
 /**
  * @param $isCorrect
  */
-function include_not_found_page($isCorrect) {
-  if ($isCorrect === false) {
+function include_not_found_page($isCorrect)
+{
+  if (boolval($isCorrect) === false) {
     print(include_template('404.php'));
     die;
   }
+}
+
+/**
+ * @param $isCorrect
+ */
+function include_server_error_page($isCorrect)
+{
+  if (boolval($isCorrect) === false) {
+    print(include_template('500.php'));
+    die;
+  }
+}
+
+/**
+ * @param boolean $condition
+ * @param string $class
+ *
+ * @return string
+ */
+function add_class (bool $condition, string $class): string
+{
+  return $condition ? " $class" : '';
+}
+
+/**
+ * @param array $file
+ * @param string $dir
+ *
+ * @return ?bool
+ */
+function move_download_file(array $file, string $dir): ?bool
+{
+  if (!empty($file) && boolval($file['name'])) {
+    return move_uploaded_file($file['tmp_name'], __DIR__ . "/$dir/" . $file['name']);
+  }
+
+  return null;
+}
+
+/**
+ * @param string $url
+ * @param string $dir
+ *
+ * @return ?bool
+ */
+function put_link_file(string $url, string $dir): ?bool
+{
+  if (!empty($url)) {
+    $downloadFile = file_get_contents($url);
+    if ($downloadFile) {
+      return file_put_contents(__DIR__ . "/$dir/" . basename($url), $downloadFile);
+    } else {
+      return false;
+    }
+  }
+
+  return null;
 }
