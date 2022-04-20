@@ -22,7 +22,7 @@ $values = $values ?? [];
               name="cite-text"
               placeholder="Текст цитаты"
             ><?= $values['cite-text'] ?? '' ?></textarea>
-            <?php print(include_template('components/adding-post/form/components/form-error.php', [
+            <?php print(include_template('components/form/form-error.php', [
               'error' => $errors['cite-text'] ?? '',
             ])); ?>
           </div>
@@ -38,7 +38,7 @@ $values = $values ?? [];
               placeholder="Автор цитаты"
               value="<?= $values['quote-author'] ?? '' ?>"
             >
-            <?php print(include_template('components/adding-post/form/components/form-error.php', [
+            <?php print(include_template('components/form/form-error.php', [
               'error' => $errors['quote-author'] ?? '',
             ])); ?>
           </div>
@@ -48,7 +48,7 @@ $values = $values ?? [];
           'value' => $values['hash-tags'] ?? '',
         ])) ?>
       </div>
-      <?php print(include_template('components/adding-post/form/components/invalid-block.php', [
+      <?php print(include_template('components/form/invalid-block.php', [
         'errors' => $errors
       ])) ?>
     </div>

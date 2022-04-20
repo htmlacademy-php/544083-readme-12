@@ -14,7 +14,7 @@ $value = $value ?? '';
       placeholder="Введите теги"
       value="<?= $value ?>"
     >
-    <?php print(include_template('components/adding-post/form/components/form-error.php', [
+    <?php print(include_template('components/form/form-error.php', [
       'error' => $error,
     ])); ?>
   </div>

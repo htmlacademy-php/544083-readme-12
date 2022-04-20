@@ -24,7 +24,7 @@ $values = $values ?? [];
               value="<?= $values['post-link'] ?? '' ?>"
               placeholder="Введите ссылку"
             >
-            <?php print(include_template('components/adding-post/form/components/form-error.php', [
+            <?php print(include_template('components/form/form-error.php', [
               'error' => $errors['post-link'] ?? '',
             ])); ?>
           </div>
@@ -34,7 +34,7 @@ $values = $values ?? [];
           'value' => $values['hash-tags'] ?? '',
         ])) ?>
       </div>
-      <?php print(include_template('components/adding-post/form/components/invalid-block.php', [
+      <?php print(include_template('components/form/invalid-block.php', [
         'errors' => $errors
       ])) ?>
     </div>
