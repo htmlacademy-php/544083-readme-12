@@ -132,7 +132,7 @@ function db_get_post_types(mysqli $link): ?array
  *
  * @return ?array
  */
-function db_get_posts(mysqli $link, int|string $tab, bool $is_all_tab, string $sort): ?array
+function db_get_posts(mysqli $link, $tab, bool $is_all_tab, string $sort): ?array
 {
   $sql_filter = !$is_all_tab ? "WHERE pt.id = ?" : '';
   $sort = mysqli_real_escape_string($link, $sort);
@@ -310,3 +310,31 @@ function db_add_post(mysqli $link, array $post, array $files, int $post_type_id)
 
   return $post_id;
 }
+
+/**
+ * Добавляет юзера
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $post array
+ * @param $files array
+ * @return boolean
+ */
+function db_add_user(mysqli $link, array $post, array $files): bool
+{
+  $email = mysqli_real_escape_string($link, $post['email']);
+  $login = mysqli_real_escape_string($link, $post['login']);
+  $password = password_hash($post['password'], PASSWORD_DEFAULT);
+  $avatar = $files['name'] ?? null;
+  $sql = "INSERT INTO users (email, login, password, avatar) VALUES ('$email', '$login', '$password', '$avatar')";
+  $result = mysqli_query($link, $sql);
+
+  if ($result === false) {
+    if (IS_DEBUGGING) {
+      die(mysqli_error($link));
+    }
+
+    return false;
+  }
+
+  return true;
+};

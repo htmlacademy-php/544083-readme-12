@@ -192,6 +192,63 @@ function validate_video_link(string $field, string $label): ?array
 }
 
 /**
+ * Валидирует поле с электоронной почтой
+ *
+ * @param string $field
+ * @param string $label
+ * @return ?array
+ */
+function validate_email_field (string $field, string $label): ?array
+{
+  if (empty($field)) {
+    return [
+      'label' => $label,
+      'error' => 'Поле долно быть заполненно'
+    ];
+  }
+
+  if (!filter_var($field, FILTER_VALIDATE_EMAIL)) {
+    return [
+      'label' => $label,
+      'error' => 'Не валидный Email'
+    ];
+  }
+
+  return null;
+}
+
+/**
+ * Валидирует поле с повтором пароля
+ *
+ * @param string $main_field
+ * @param string $field
+ * @param string $label
+ * @return ?array
+ */
+function validate_repeat_password (string $main_field, string $field, string $label): ?array
+{
+  if (empty($main_field)) {
+    return null;
+  }
+
+  if (empty($field)) {
+    return [
+      'label' => $label,
+      'error' => 'Поле долно быть заполненно'
+    ];
+  }
+
+  if ($field !== $main_field) {
+    return [
+      'label' => $label,
+      'error' => 'Пароли не совпадают'
+    ];
+  }
+
+  return null;
+}
+
+/**
  * Возвращиет ошибки формы добавление поста
  * @param array $post
  * @param array $files
@@ -217,8 +274,6 @@ function get_errors_post_form (array $post, array $files): array
     }
   }
 
-  $errors = array_filter($errors);
-
   if ($post['type'] === 'photo') {
     if (isset($files['post-photo']) && boolval($files['post-photo']['name'])) {
       $error = validate_photo($files['post-photo'], 'Фото');
@@ -237,5 +292,34 @@ function get_errors_post_form (array $post, array $files): array
     }
   }
 
-  return $errors;
+  return array_filter($errors);
+}
+
+/**
+ * Возвращиет ошибки формы регистрации
+ * @param array $post
+ * @param array $file
+ *
+ * @return array
+ */
+function get_errors_join_form (array $post, array $file): array
+{
+  $errors = [];
+
+  $rules = [
+    'email' => fn() => validate_email_field($post['email'], 'Электронная почта'),
+    'login' => fn() => validate_text_field($post['login'], 'Логин', true, 3, 32),
+    'password' => fn() => validate_text_field($post['password'], 'Пароль', true, 7, 64),
+    'password-repeat' => fn() => validate_repeat_password($post['password'], $post['password-repeat'], 'Повтор пароля'),
+  ];
+
+  foreach ($post as $key => $field) {
+    if (isset($rules[$key])) {
+      $errors[$key] = $rules[$key]();
+    }
+  }
+
+  $errors['userpic-file'] = validate_photo($file, 'Фото');
+
+  return array_filter($errors);
 }
