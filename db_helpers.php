@@ -324,7 +324,7 @@ function db_add_user(mysqli $link, array $post, array $files): bool
   $email = mysqli_real_escape_string($link, $post['email']);
   $login = mysqli_real_escape_string($link, $post['login']);
   $password = password_hash($post['password'], PASSWORD_DEFAULT);
-  $avatar = $files['name'] ?? null;
+  $avatar = mysqli_real_escape_string($link, $files['name']) ?? null;
   $sql = "INSERT INTO users (email, login, password, avatar) VALUES ('$email', '$login', '$password', '$avatar')";
   $result = mysqli_query($link, $sql);
 

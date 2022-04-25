@@ -22,7 +22,7 @@ $values = $values ?? [];
               name="post-text"
               placeholder="Введите текст публикации"
             ><?= $values['post-text'] ?? '' ?></textarea>
-            <?php print(include_template('components/adding-post//components/form-error.php', [
+            <?php print(include_template('components/adding-post/components/form-error.php', [
               'error' => $errors['post-text'] ?? '',
             ])); ?>
           </div>
