@@ -22,7 +22,7 @@ $values = $values ?? [];
               name="post-text"
               placeholder="Введите текст публикации"
             ><?= $values['post-text'] ?? '' ?></textarea>
-            <?php print(include_template('components/adding-post/form/components/form-error.php', [
+            <?php print(include_template('components/adding-post/components/form-error.php', [
               'error' => $errors['post-text'] ?? '',
             ])); ?>
           </div>
@@ -32,7 +32,7 @@ $values = $values ?? [];
           'value' => $values['hash-tags'] ?? '',
         ])) ?>
       </div>
-      <?php print(include_template('components/adding-post/form/components/invalid-block.php', [
+      <?php print(include_template('components/form/invalid-block.php', [
         'errors' => $errors
       ])) ?>
     </div>
