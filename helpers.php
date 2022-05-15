@@ -322,12 +322,26 @@ function add_class (bool $condition, string $class): string
  * @param array $file
  * @param string $dir
  *
- * @return ?bool
+ * @return ?string
  */
-function move_download_file(array $file, string $dir): ?bool
+function move_download_file(array $file, string $dir = 'img'): ?string
 {
   if (!empty($file) && boolval($file['name'])) {
-    return move_uploaded_file($file['tmp_name'], __DIR__ . "/$dir/" . $file['name']);
+    $type = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $base_dir = __DIR__;
+
+    do {
+      $name = md5(microtime() . rand(0, 9999));
+      $new_name = "$base_dir/$dir/$name.$type";
+    } while (file_exists($new_name));
+
+    $move = move_uploaded_file($file['tmp_name'], $new_name);
+
+    if ($move) {
+      return "$name.$type";
+    } else {
+      return false;
+    }
   }
 
   return null;
@@ -337,16 +351,29 @@ function move_download_file(array $file, string $dir): ?bool
  * @param string $url
  * @param string $dir
  *
- * @return ?bool
+ * @return ?string
  */
-function put_link_file(string $url, string $dir): ?bool
+function put_link_file(string $url, string $dir = 'img'): ?string
 {
   if (!empty($url)) {
+    $type = pathinfo($url, PATHINFO_EXTENSION);
+    $base_dir = __DIR__;
+
+    do {
+      $name = md5(microtime() . rand(0, 9999));
+      $new_name = "$base_dir/$dir/$name.$type";
+    } while (file_exists($new_name));
+
     $downloadFile = file_get_contents($url);
+
     if ($downloadFile) {
-      return file_put_contents(__DIR__ . "/$dir/" . basename($url), $downloadFile);
-    } else {
-      return false;
+      $put_file = file_put_contents($new_name, $downloadFile);
+
+      if ($put_file) {
+        return "$name.$type";
+      } else {
+        return false;
+      }
     }
   }
 

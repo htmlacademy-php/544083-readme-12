@@ -1,44 +1,49 @@
 <?php
+session_start();
+if (!empty($_SESSION['user'])) {
+  header("location: popular.php");
+}
 
+require_once('enums.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
+require_once('validator.php');
 
-date_default_timezone_set('Europe/Moscow');
+$errors = [];
 
-$is_auth = rand(0, 1);
+if (count($_POST) > 0) {
+  $errors = get_errors_login_form($_POST);
 
-$user_name = 'Alexandr';
+  if (count($errors) === 0) {
+    $con = db_connect();
+    include_server_error_page($con);
+    mysqli_set_charset($con, "utf8");
 
-$con = db_connect();
-include_server_error_page($con);
+    $user = db_get_login_user($con, $_POST['login']);
 
-mysqli_set_charset($con, "utf8");
+    if ($user === null) {
+      $errors['login'] = [
+        'error' => 'Неверный логин'
+      ];
+    } elseif (!password_verify($_POST['password'], $user['password'])) {
+      $errors['password'] = [
+        'error' => 'Пароли не совпадают'
+      ];
+    } else {
+      $_SESSION['user'] = [
+        'id' => $user['id'],
+        'login' => $user['login'],
+        'avatar' => $user['avatar'],
+      ];
 
-$post_types = db_get_post_types($con);
-include_server_error_page($post_types);
+      header("location: feed.php");
+    }
+  }
+}
 
-$all_tab = 'all';
-$tab = $_GET['tab'] ?? $all_tab;
-$is_all_tab = $tab === $all_tab;
-
-$sort = $_GET['sort'] ?? 'views';
-
-$posts = db_get_posts($con, $tab, $is_all_tab, $sort);
-include_server_error_page($posts);
-
-$page_content = include_template('main.php', [
-  'post_types' => $post_types,
-  'posts' => $posts,
-  'tab' => $tab,
-  'sort' => $sort,
-  'is_all_tab' => $is_all_tab,
-]);
-
-$layout_content = include_template('layout.php', [
-  'title' => 'readme: популярное',
-  'is_auth' => $is_auth,
-  'user_name' => $user_name,
-  'content' => $page_content,
+$layout_content = include_template('main.php', [
+  'errors' => $errors,
+  'login_value' => count($errors) > 0 ? htmlspecialchars($_POST['login'] ?? '') : '',
 ]);
 
 print($layout_content);

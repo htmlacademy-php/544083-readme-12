@@ -111,13 +111,6 @@ function validate_photo(array $file, string $label): ?array
         'label' => $label
       ];
     }
-
-    if (file_exists(__DIR__ . '/img/' . $file['name'])) {
-      return [
-        'error' => 'Изображение с таким названием уже существует, измените название или загрузите другую картинку',
-        'label' => $label
-      ];
-    }
   }
 
   return null;
@@ -144,13 +137,6 @@ function validate_photo_link(string $field, string $label): ?array
       return [
         'error' => 'Тип файла должен соответствовать одному из форматов "png", "jpeg", "gif"',
         'label' => $label,
-      ];
-    }
-
-    if (file_exists(__DIR__ . '/img/' . basename($field))) {
-      return [
-        'error' => 'Изображение с таким названием уже существует, измените название или загрузите другую картинку',
-        'label' => $label
       ];
     }
   }
@@ -319,7 +305,31 @@ function get_errors_join_form (array $post, array $file): array
     }
   }
 
-  $errors['userpic-file'] = validate_photo($file, 'Фото');
+  $errors['userpic-file'] = validate_photo($file, 'Фото', 'img/avatars', 'userpic-' . $post['login']);
+
+  return array_filter($errors);
+}
+
+/**
+ * Возвращиет ошибки формы авторизации
+ * @param array $post
+ *
+ * @return array
+ */
+function get_errors_login_form (array $post): array
+{
+  $errors = [];
+
+  $rules = [
+    'login' => fn() => validate_text_field($post['login'], 'Логин', true),
+    'password' => fn() => validate_text_field($post['password'], 'Пароль', true),
+  ];
+
+  foreach ($post as $key => $field) {
+    if (isset($rules[$key])) {
+      $errors[$key] = $rules[$key]();
+    }
+  }
 
   return array_filter($errors);
 }

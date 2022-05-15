@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (empty($_SESSION['user'])) {
+  header("location: index.php");
+}
+
 require_once('helpers.php');
 require_once('db_helpers.php');
 require_once('validator.php');
@@ -29,14 +34,14 @@ $values = [];
 if (count($_POST) > 0) {
   $errors = get_errors_post_form($_POST, $_FILES);
   if (count($errors) === 0) {
-    $move_file = move_download_file($_FILES['post-photo'] ?? [], 'img');
+    $move_file = move_download_file($_FILES['post-photo'] ?? []);
     if ($move_file === false) {
       $errors['post-photo'] = [
         'error' => 'Не удалось загрузить изображение',
         'label' => 'Фото'
       ];
     } elseif ($move_file === null) {
-      $put_file = put_link_file($_POST['photo-url'] ?? '', 'img');
+      $put_file = put_link_file($_POST['photo-url'] ?? '');
       if ($put_file === false) {
         $errors['photo-url'] = [
           'error' => 'Не удалось скачать файл',
@@ -47,7 +52,7 @@ if (count($_POST) > 0) {
 
     if (count($errors) === 0) {
       $type_id = array_search($_POST['type'] ?? [], $types);
-      $post_id = db_add_post($con, $_POST, $_FILES, $type_id);
+      $post_id = db_add_post($con, $_POST, $move_file ?? '', $put_file ?? '', $type_id, $_SESSION['user']['id']);
       include_server_error_page($post_id);
       header("location: post.php?id=$post_id");
     }
@@ -70,8 +75,8 @@ $page_content = include_template('adding-post.php', [
 $layout_content = include_template('layout.php', [
   'title' => 'Добавление поста',
   'is_auth' => $is_auth,
-  'user_name' => $user_name,
   'content' => $page_content,
+  'user' => $_SESSION['user'],
 ]);
 
 print($layout_content);

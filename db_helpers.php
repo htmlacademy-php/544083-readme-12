@@ -128,13 +128,26 @@ function db_get_post_types(mysqli $link): ?array
  * @param $link mysqli Ресурс соединения
  * @param $tab int | string
  * @param $is_all_tab boolean
- * @param $sort string
+ * @param $sort string|null
+ * @param  $user_id int|null
  *
  * @return ?array
  */
-function db_get_posts(mysqli $link, $tab, bool $is_all_tab, string $sort): ?array
+function db_get_posts(mysqli $link, $tab, bool $is_all_tab, string $sort = null, int $user_id = null): ?array
 {
   $sql_filter = !$is_all_tab ? "WHERE pt.id = ?" : '';
+
+  if ($user_id !== null) {
+    if ($sql_filter !== '') {
+      $sql_filter = $sql_filter . " AND u.id = $user_id";
+    } else {
+      $sql_filter = "WHERE u.id = $user_id";
+    }
+  }
+
+
+  $sort = is_null($sort) ? '' : "ORDER BY $sort DESC";
+
   $sort = mysqli_real_escape_string($link, $sort);
   $sql =
     "
@@ -149,14 +162,16 @@ function db_get_posts(mysqli $link, $tab, bool $is_all_tab, string $sort): ?arra
       pt.type, 
       u.login AS author,
       u.avatar, 
-      COUNT(l.post_id) as likes 
+      COUNT(l.post_id) as likes,
+      COUNT(c.post_id) as comments_count
     FROM posts p
     JOIN users u ON p.author_id = u.id
     JOIN post_types pt ON pt.id = p.type_id
     LEFT JOIN likes l ON l.post_id = p.id
+    LEFT JOIN comments c ON c.post_id = p.id
     $sql_filter
     GROUP BY p.id
-    ORDER BY $sort DESC
+    $sort
   ";
   $stmt = db_get_prepare_stmt($link, $sql, !$is_all_tab ? [$tab] : []);
 
@@ -212,7 +227,6 @@ function db_get_user(mysqli $link, int $id): ?array
       u.login,
       u.dt_add,
       u.avatar,
-      u.login,
       (SELECT COUNT(follower_id) FROM subscriptions WHERE following_id = $id) as followers_count,
       (SELECT COUNT(id) FROM posts WHERE author_id = $id) as posts_count
     FROM users u
@@ -228,12 +242,14 @@ function db_get_user(mysqli $link, int $id): ?array
  *
  * @param $link mysqli Ресурс соединения
  * @param $post array
- * @param $files array
  * @param $post_type_id int
+ * @param $author_id int
+ * @param $download_img_name string
+ * @param $link_img_name string
  *
  * @return ?int
  */
-function db_add_post(mysqli $link, array $post, array $files, int $post_type_id): ?int
+function db_add_post(mysqli $link, array $post, string $download_img_name, string $link_img_name, int $post_type_id, int $author_id): ?int
 {
   $content = '';
   $columns = ['author_id', 'type_id', 'title'];
@@ -248,10 +264,10 @@ function db_add_post(mysqli $link, array $post, array $files, int $post_type_id)
       break;
     case 'photo':
       array_push($columns, 'image');
-      if (isset($files['post-photo']) && boolval($files['post-photo']['name'])) {
-        $content = sprintf("'%s'", $files['post-photo']['name']);
+      if (boolval($download_img_name)) {
+        $content = "'$download_img_name'";
       } else {
-        $content = sprintf("'%s'", basename($post['photo-url']));
+        $content = "'$link_img_name'";
       }
       break;
     case 'link':
@@ -265,7 +281,7 @@ function db_add_post(mysqli $link, array $post, array $files, int $post_type_id)
   }
   $columns = implode(',', $columns);
   $title = sprintf("'%s'", mysqli_real_escape_string($link, $post['post-title']));
-  $sql = "INSERT INTO posts ($columns) VALUES (1, $post_type_id, $title, $content)";
+  $sql = "INSERT INTO posts ($columns) VALUES ($author_id, $post_type_id, $title, $content)";
   $result = mysqli_query($link, $sql);
 
   if ($result === false) {
@@ -316,15 +332,15 @@ function db_add_post(mysqli $link, array $post, array $files, int $post_type_id)
  *
  * @param $link mysqli Ресурс соединения
  * @param $post array
- * @param $files array
+ * @param $avatar string
  * @return boolean
  */
-function db_add_user(mysqli $link, array $post, array $files): bool
+function db_add_user(mysqli $link, array $post, string $avatar): bool
 {
   $email = mysqli_real_escape_string($link, $post['email']);
   $login = mysqli_real_escape_string($link, $post['login']);
   $password = password_hash($post['password'], PASSWORD_DEFAULT);
-  $avatar = mysqli_real_escape_string($link, $files['name']) ?? null;
+  $avatar = $avatar ?? null;
   $sql = "INSERT INTO users (email, login, password, avatar) VALUES ('$email', '$login', '$password', '$avatar')";
   $result = mysqli_query($link, $sql);
 
@@ -338,3 +354,19 @@ function db_add_user(mysqli $link, array $post, array $files): bool
 
   return true;
 };
+
+/**
+ * Возвращает залогиненного юзера
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $login string
+ * @return boolean
+ */
+function db_get_login_user (mysqli $link, string $login)
+{
+  $login = mysqli_real_escape_string($link, $login);
+  $sql = "SELECT id, login, avatar, password FROM users WHERE login = '$login'";
+  $stmt = db_get_prepare_stmt($link, $sql);
+
+  return db_get_fetch_all($link, $stmt)[0] ?? null;
+}
