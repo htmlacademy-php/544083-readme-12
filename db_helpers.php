@@ -356,7 +356,7 @@ function db_add_user(mysqli $link, array $post, string $avatar): bool
 };
 
 /**
- * Возвращает залогиненного юзера
+ * Возвращает юзера по логину
  *
  * @param $link mysqli Ресурс соединения
  * @param $login string

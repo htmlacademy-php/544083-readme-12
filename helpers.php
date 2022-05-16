@@ -322,9 +322,9 @@ function add_class (bool $condition, string $class): string
  * @param array $file
  * @param string $dir
  *
- * @return ?string
+ * @return bool|string|null
  */
-function move_download_file(array $file, string $dir = 'img'): ?string
+function move_download_file(array $file, string $dir = 'img'): bool|string|null
 {
   if (!empty($file) && boolval($file['name'])) {
     $type = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -351,9 +351,9 @@ function move_download_file(array $file, string $dir = 'img'): ?string
  * @param string $url
  * @param string $dir
  *
- * @return ?string
+ * @return bool|string|null
  */
-function put_link_file(string $url, string $dir = 'img'): ?string
+function put_link_file(string $url, string $dir = 'img'): bool|string|null
 {
   if (!empty($url)) {
     $type = pathinfo($url, PATHINFO_EXTENSION);
