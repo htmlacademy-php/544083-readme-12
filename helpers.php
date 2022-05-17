@@ -322,9 +322,9 @@ function add_class (bool $condition, string $class): string
  * @param array $file
  * @param string $dir
  *
- * @return bool|string|null
+ * @return ?string
  */
-function move_download_file(array $file, string $dir = 'img'): bool|string|null
+function move_download_file(array $file, string $dir = 'img'): ?string
 {
   if (!empty($file) && boolval($file['name'])) {
     $type = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -340,7 +340,7 @@ function move_download_file(array $file, string $dir = 'img'): bool|string|null
     if ($move) {
       return "$name.$type";
     } else {
-      return false;
+      return '';
     }
   }
 
@@ -351,9 +351,9 @@ function move_download_file(array $file, string $dir = 'img'): bool|string|null
  * @param string $url
  * @param string $dir
  *
- * @return bool|string|null
+ * @return ?string
  */
-function put_link_file(string $url, string $dir = 'img'): bool|string|null
+function put_link_file(string $url, string $dir = 'img'): ?string
 {
   if (!empty($url)) {
     $type = pathinfo($url, PATHINFO_EXTENSION);
@@ -372,7 +372,7 @@ function put_link_file(string $url, string $dir = 'img'): bool|string|null
       if ($put_file) {
         return "$name.$type";
       } else {
-        return false;
+        return '';
       }
     }
   }

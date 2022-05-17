@@ -31,14 +31,14 @@ if (count($_POST) > 0) {
   $errors = get_errors_post_form($_POST, $_FILES);
   if (count($errors) === 0) {
     $move_file = move_download_file($_FILES['post-photo'] ?? []);
-    if ($move_file === false) {
+    if ($move_file === '') {
       $errors['post-photo'] = [
         'error' => 'Не удалось загрузить изображение',
         'label' => 'Фото'
       ];
     } elseif ($move_file === null) {
       $put_file = put_link_file($_POST['photo-url'] ?? '');
-      if ($put_file === false) {
+      if ($put_file === '') {
         $errors['photo-url'] = [
           'error' => 'Не удалось скачать файл',
           'label' => 'Ссылка',

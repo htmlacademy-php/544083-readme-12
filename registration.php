@@ -20,7 +20,7 @@ if (count($_POST) > 0) {
 
   if (count($errors) === 0) {
     $move_file = move_download_file($_FILES['userpic-file'] ?? []);
-    if ($move_file === false) {
+    if ($move_file === '') {
       $errors['userpic-file'] = [
         'error' => 'Не удалось загрузить изображение',
         'label' => 'Фото'
