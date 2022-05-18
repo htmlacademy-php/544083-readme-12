@@ -1,10 +1,10 @@
 <?php
+require_once('session.php');
+require_once('enums.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
 
 date_default_timezone_set('Europe/Moscow');
-
-$is_auth = true;
 
 $con = db_connect();
 include_server_error_page($con);
@@ -29,7 +29,7 @@ $page_content = include_template('post-details.php', [
 $layout_content = include_template('layout.php', [
   'title' => 'readme Пост',
   'content' => $page_content,
-  'is_auth' => $is_auth,
+  'user' => $_SESSION['user'],
 ]);
 
 print($layout_content);

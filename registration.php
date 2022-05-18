@@ -19,8 +19,8 @@ if (count($_POST) > 0) {
   $errors = get_errors_join_form($_POST, $_FILES['userpic-file'] ?? []);
 
   if (count($errors) === 0) {
-    $move_file = move_download_file($_FILES['userpic-file'] ?? [], 'img');
-    if ($move_file === false) {
+    $move_file = move_download_file($_FILES['userpic-file'] ?? []);
+    if ($move_file === '') {
       $errors['userpic-file'] = [
         'error' => 'Не удалось загрузить изображение',
         'label' => 'Фото'
@@ -32,7 +32,6 @@ if (count($_POST) > 0) {
       $sql_login = "SELECT login FROM users WHERE login = '$login'";
 
       $sql_email_res = mysqli_query($con, $sql_email);
-      $sql_login_res = mysqli_query($con, $sql_login);
 
       if ($sql_email_res === false) {
         include_server_error_page($sql_email_res);
@@ -44,6 +43,8 @@ if (count($_POST) > 0) {
           ];
         }
       }
+
+      $sql_login_res = mysqli_query($con, $sql_login);
 
       if ($sql_login_res === false) {
         include_server_error_page($sql_login_res);
@@ -63,9 +64,9 @@ if (count($_POST) > 0) {
       $values[$key] = htmlspecialchars($post);
     }
   } else {
-     $add_user = db_add_user($con, $_POST, $_FILES['userpic-file'] ?? []);
+     $add_user = db_add_user($con, $_POST, $move_file ?? '');
      include_server_error_page($add_user);
-     header("location: index.php");
+     header("location: popular.php");
   }
 }
 
