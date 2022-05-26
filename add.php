@@ -7,9 +7,6 @@ require_once('validator.php');
 
 date_default_timezone_set('Europe/Moscow');
 
-$is_auth = true;
-$user_name = 'Alexandr';
-
 $con = db_connect();
 
 include_server_error_page($con);
@@ -38,7 +35,7 @@ if (count($_POST) > 0) {
       ];
     } elseif ($move_file === null) {
       $put_file = put_link_file($_POST['photo-url'] ?? '');
-      if ($put_file === '') {
+      if (!(bool)$put_file) {
         $errors['photo-url'] = [
           'error' => 'Не удалось скачать файл',
           'label' => 'Ссылка',
@@ -70,7 +67,6 @@ $page_content = include_template('adding-post.php', [
 
 $layout_content = include_template('layout.php', [
   'title' => 'Добавление поста',
-  'is_auth' => $is_auth,
   'content' => $page_content,
   'user' => $_SESSION['user'],
 ]);

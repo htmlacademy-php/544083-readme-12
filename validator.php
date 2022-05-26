@@ -133,6 +133,14 @@ function validate_photo_link(string $field, string $label): ?array
       ];
     }
 
+    $hds = get_headers($field);
+    if (!$hds || (str_contains($hds[0], ' 404 '))) {
+      return [
+        'error' => 'Ссылки не существует',
+        'label' => $label,
+      ];
+    }
+
     if (!in_array(pathinfo($field, PATHINFO_EXTENSION), ['jpg', 'jpeg', 'png', 'gif'])) {
       return [
         'error' => 'Тип файла должен соответствовать одному из форматов "png", "jpeg", "gif"',

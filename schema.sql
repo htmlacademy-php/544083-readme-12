@@ -47,6 +47,8 @@ CREATE TABLE posts (
    CONSTRAINT post_type_ref FOREIGN KEY (type_id) REFERENCES post_types (id) ON DELETE CASCADE
 );
 
+CREATE FULLTEXT INDEX post_ft_ic ON posts(title, text, quote_author);
+/* TODO нужны ли индексы post_title_ix, post_text_ix, quote_author_ix ???? */
 CREATE INDEX post_title_ix ON posts(title);
 CREATE INDEX post_text_ix ON posts(text(255));
 CREATE INDEX quote_author_ix ON posts(quote_author);

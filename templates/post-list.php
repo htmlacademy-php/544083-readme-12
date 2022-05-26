@@ -95,9 +95,10 @@
           $avatar = htmlspecialchars($post['avatar']) ?? '';
           $author = htmlspecialchars($post['author']) ?? '';
           $id = $post['id'] ?? '';
-          $time = generate_random_date($key);
+          $likes_count = $post['likes_count'] ?? 0;
+          $comments_count = $post['comments_count'] ?? 0;
+          $dt_add = $post['dt_add'] ?? '';
           ?>
-
           <article class="popular__post post post-<?= $type ?>">
             <header class="post__header">
               <h2>
@@ -148,10 +149,10 @@
                     <b class="post__author-name"><?= $author ?></b>
                     <time
                       class="post__time"
-                      datetime="<?= $time ?>"
-                      title="<?= date_format(date_create($time), 'd.m.Y H:m'); ?>"
+                      datetime="<?= strtotime($dt_add) ?>"
+                      title="<?= date_format(date_create($dt_add), 'd.m.Y H:m'); ?>"
                     >
-                      <?= relative_time($current_time - strtotime($time)); ?> назад
+                      <?= relative_time($current_time - strtotime($dt_add)); ?> назад
                     </time>
                   </div>
                 </a>
@@ -166,14 +167,14 @@
                          height="17">
                       <use xlink:href="#icon-heart-active"></use>
                     </svg>
-                    <span>0</span>
+                    <span><?= $likes_count ?></span>
                     <span class="visually-hidden">количество лайков</span>
                   </a>
                   <a class="post__indicator post__indicator--comments button" href="#" title="Комментарии">
                     <svg class="post__indicator-icon" width="19" height="17">
                       <use xlink:href="#icon-comment"></use>
                     </svg>
-                    <span>0</span>
+                    <span><?= $comments_count ?></span>
                     <span class="visually-hidden">количество комментариев</span>
                   </a>
                 </div>
