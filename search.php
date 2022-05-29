@@ -4,14 +4,9 @@ require_once('enums.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
 require_once('validator.php');
+require_once('init.php');
 
-date_default_timezone_set('Europe/Moscow');
-
-$con = db_connect();
-
-include_server_error_page($con);
-
-mysqli_set_charset($con, "utf8");
+$con = $con ?? null;
 
 $query = $_GET['search'] ?? '';
 $posts = [];

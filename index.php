@@ -8,6 +8,7 @@ require_once('enums.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
 require_once('validator.php');
+require_once('init.php');
 
 $errors = [];
 
@@ -15,9 +16,7 @@ if (count($_POST) > 0) {
   $errors = get_errors_login_form($_POST);
 
   if (count($errors) === 0) {
-    $con = db_connect();
-    include_server_error_page($con);
-    mysqli_set_charset($con, "utf8");
+    $con = $con ?? null;
 
     $user = db_get_login_user($con, $_POST['login']);
 

@@ -220,13 +220,7 @@ function db_get_post(mysqli $link, int $post_id): ?array
     $hash_tags = db_get_fetch_all($link, $stmt_ht) ?? null;
 
     if ($hash_tags !== null) {
-      $hash_tags_values = [];
-
-      foreach ($hash_tags as $key => $tag) {
-        $hash_tags_values[$key] = $tag['name'];
-      }
-
-      $post['hash_tags'] = $hash_tags_values;
+      $post['hash_tags'] = array_column($hash_tags, 'name');
     }
   }
 
