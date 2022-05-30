@@ -133,7 +133,7 @@ function db_get_post_types(mysqli $link): ?array
  *
  * @return ?array
  */
-function db_get_posts(mysqli $link, $tab, bool $is_all_tab, string $sort = null, int $user_id = null): ?array
+function db_get_posts(mysqli $link, int|string $tab, bool $is_all_tab, string $sort = null, int $user_id = null): ?array
 {
   $sql_filter = !$is_all_tab ? "WHERE pt.id = ?" : '';
 
@@ -162,7 +162,7 @@ function db_get_posts(mysqli $link, $tab, bool $is_all_tab, string $sort = null,
       pt.type, 
       u.login AS author,
       u.avatar, 
-      COUNT(l.post_id) as likes,
+      COUNT(l.post_id) as likes_count,
       COUNT(c.post_id) as comments_count
     FROM posts p
     JOIN users u ON p.author_id = u.id
@@ -182,13 +182,13 @@ function db_get_posts(mysqli $link, $tab, bool $is_all_tab, string $sort = null,
  * Возвращает пост
  *
  * @param $link mysqli Ресурс соединения
- * @param $id int
+ * @param $post_id int
  *
  * @return ?array
  */
-function db_get_post(mysqli $link, int $id): ?array
+function db_get_post(mysqli $link, int $post_id): ?array
 {
-  $sql =
+  $sql_post =
   "
     SELECT 
       p.id,
@@ -206,9 +206,102 @@ function db_get_post(mysqli $link, int $id): ?array
     JOIN post_types pt ON pt.id = p.type_id
     WHERE p.id = ?
   ";
-  $stmt = db_get_prepare_stmt($link, $sql, array_fill(0, 3, $id));
+  $stmt_post = db_get_prepare_stmt($link, $sql_post, array_fill(0, 3, $post_id));
+  $post = db_get_fetch_all($link, $stmt_post)[0] ?? null;
 
-  return db_get_fetch_all($link, $stmt)[0] ?? null;
+  if ($post !== null) {
+    $sql_ht =
+      "
+        SELECT ht.name FROM posts_by_hashtags pbh
+        JOIN hashtags ht ON pbh.hash_tag_id = ht.id
+        WHERE pbh.post_id = ?
+      ";
+    $stmt_ht = db_get_prepare_stmt($link, $sql_ht, [$post_id]);
+    $hash_tags = db_get_fetch_all($link, $stmt_ht) ?? null;
+
+    if ($hash_tags !== null) {
+      $post['hash_tags'] = array_column($hash_tags, 'name');
+    }
+  }
+
+  return $post;
+}
+
+/**
+ * Возвращает список постов по поиску
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $query string
+ *
+ * @return ?array
+ */
+function db_get_search_posts(mysqli $link, string $query): ?array
+{
+  $sql =
+    "
+    SELECT
+      p.id,
+      p.dt_add,
+      p.title, 
+      p.text, 
+      p.quote_author, 
+      p.link, 
+      p.image, 
+      pt.type, 
+      u.login AS author,
+      u.avatar,
+      COUNT(l.post_id) as likes_count,
+      COUNT(c.post_id) as comments_count
+    FROM posts p
+    JOIN users u ON p.author_id = u.id
+    JOIN post_types pt ON pt.id = p.type_id
+    LEFT JOIN likes l ON l.post_id = p.id
+    LEFT JOIN comments c ON c.post_id = p.id
+    WHERE MATCH(p.title, p.text, p.quote_author) AGAINST(?)
+    GROUP BY p.id
+  ";
+  $stmt = db_get_prepare_stmt($link, $sql, [$query]);
+
+  return db_get_fetch_all($link, $stmt);
+}
+
+/**
+ * Возвращает список постов по хештегу
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $tag string
+ *
+ * @return ?array
+ */
+function db_get_hash_tag_posts(mysqli $link, string $tag): ?array
+{
+  $sql =
+    "
+    SELECT
+      p.id,
+      p.dt_add,
+      p.title, 
+      p.text, 
+      p.quote_author, 
+      p.link, 
+      p.image, 
+      pt.type, 
+      u.login AS author,
+      u.avatar,
+      COUNT(l.post_id) as likes_count,
+      COUNT(c.post_id) as comments_count
+    FROM posts p
+    JOIN users u ON p.author_id = u.id
+    JOIN post_types pt ON pt.id = p.type_id
+    LEFT JOIN likes l ON l.post_id = p.id
+    LEFT JOIN comments c ON c.post_id = p.id
+    WHERE p.id in (SELECT post_id FROM posts_by_hashtags psb WHERE (psb.hash_tag_id in (SELECT id FROM hashtags WHERE name = ?)))
+    GROUP BY p.id
+    ORDER BY dt_add DESC
+  ";
+  $stmt = db_get_prepare_stmt($link, $sql, [$tag]);
+
+  return db_get_fetch_all($link, $stmt);
 }
 
 /**
@@ -298,18 +391,28 @@ function db_add_post(mysqli $link, array $post, string $download_img_name, strin
     $tags = explode(' ', $post['hash-tags']);
     foreach ($tags as $tag) {
       $tag = mysqli_real_escape_string($link, $tag);
-      $sql_ht = "REPLACE INTO hashtags (name) VALUES ('$tag')";
-      $result_ht = mysqli_query($link, $sql_ht);
 
-      if ($result_ht === false) {
-        if (IS_DEBUGGING) {
-          die(mysqli_error($link));
+      $sql_ht_select = "SELECT id FROM hashtags WHERE name = ?";
+      $stmt_ht = db_get_prepare_stmt($link, $sql_ht_select, [$tag]);
+      $hashtags = db_get_fetch_all($link, $stmt_ht)[0] ?? null;
+      $id_ht = null;
+
+      if ($hashtags === null) {
+        $sql_ht_insert = "INSERT INTO hashtags (name) VALUES ('$tag')";
+        $result_ht = mysqli_query($link, $sql_ht_insert);
+
+        if ($result_ht === false) {
+          if (IS_DEBUGGING) {
+            die(mysqli_error($link));
+          }
+
+          return null;
         }
 
-        return null;
+        $id_ht = mysqli_insert_id($link);
+      } else {
+        $id_ht = $hashtags['id'];
       }
-
-      $id_ht = mysqli_insert_id($link);
 
       $sql_post_by_ht = "INSERT INTO posts_by_hashtags (post_id, hash_tag_id) VALUES ($post_id, $id_ht)";
       $result_post_by_ht = mysqli_query($link, $sql_post_by_ht);

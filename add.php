@@ -4,17 +4,9 @@ require_once('enums.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
 require_once('validator.php');
+require_once('init.php');
 
-date_default_timezone_set('Europe/Moscow');
-
-$is_auth = true;
-$user_name = 'Alexandr';
-
-$con = db_connect();
-
-include_server_error_page($con);
-
-mysqli_set_charset($con, "utf8");
+$con = $con ?? null;
 
 $post_types = db_get_post_types($con);
 include_server_error_page($post_types);
@@ -38,7 +30,7 @@ if (count($_POST) > 0) {
       ];
     } elseif ($move_file === null) {
       $put_file = put_link_file($_POST['photo-url'] ?? '');
-      if ($put_file === '') {
+      if (!(bool)$put_file) {
         $errors['photo-url'] = [
           'error' => 'Не удалось скачать файл',
           'label' => 'Ссылка',
@@ -70,7 +62,6 @@ $page_content = include_template('adding-post.php', [
 
 $layout_content = include_template('layout.php', [
   'title' => 'Добавление поста',
-  'is_auth' => $is_auth,
   'content' => $page_content,
   'user' => $_SESSION['user'],
 ]);

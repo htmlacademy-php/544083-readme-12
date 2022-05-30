@@ -47,9 +47,7 @@ CREATE TABLE posts (
    CONSTRAINT post_type_ref FOREIGN KEY (type_id) REFERENCES post_types (id) ON DELETE CASCADE
 );
 
-CREATE INDEX post_title_ix ON posts(title);
-CREATE INDEX post_text_ix ON posts(text(255));
-CREATE INDEX quote_author_ix ON posts(quote_author);
+CREATE FULLTEXT INDEX post_ft_ic ON posts(title, text, quote_author);
 
 CREATE TABLE posts_by_hashtags (
     post_id INT NOT NULL,

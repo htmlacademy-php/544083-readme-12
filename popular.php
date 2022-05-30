@@ -3,13 +3,9 @@ require_once('session.php');
 require_once('enums.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
+require_once('init.php');
 
-date_default_timezone_set('Europe/Moscow');
-
-$con = db_connect();
-include_server_error_page($con);
-
-mysqli_set_charset($con, "utf8");
+$con = $con ?? null;
 
 $post_types = db_get_post_types($con);
 include_server_error_page($post_types);

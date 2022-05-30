@@ -97,14 +97,17 @@ $user = $user ?? [];
               ?>
             </span>
           </div>
-          <ul class="post__tags">
-            <li><a href="#">#nature</a></li>
-            <li><a href="#">#globe</a></li>
-            <li><a href="#">#photooftheday</a></li>
-            <li><a href="#">#canon</a></li>
-            <li><a href="#">#landscape</a></li>
-            <li><a href="#">#щикарныйвид</a></li>
-          </ul>
+          <?php if (isset($post['hash_tags'])): ?>
+            <ul class="post__tags">
+              <?php foreach($post['hash_tags'] as $tag): ?>
+                <li>
+                  <a href="<?= '/search.php?search=' . urlencode("#$tag")  ?>">
+                    <?= "#$tag" ?>
+                  </a>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          <?php endif; ?>
           <div class="comments">
             <form class="comments__form form" action="#" method="post">
               <div class="comments__my-avatar">
