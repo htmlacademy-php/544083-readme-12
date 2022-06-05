@@ -1,3 +1,10 @@
+<?php
+$get_params = $get_params ?? null;
+$need_pagination = $need_pagination ?? null;
+$prev_page_link = $prev_page_link ?? null;
+$next_page_link = $next_page_link ?? null;
+?>
+
 <section class="page__main page__main--popular">
   <div class="container">
     <h1 class="page__title page__title--popular">Популярное</h1>
@@ -20,8 +27,8 @@
           </li>
           <li class="sorting__item">
             <a
-              class="sorting__link<?= ($sort ?? '') === 'likes' ?  ' sorting__link--active' : ''?>"
-              href="?<?= http_build_query(['sort' => 'likes', 'tab' => $tab ?? '']) ?>"
+              class="sorting__link<?= ($sort ?? '') === 'likes_count' ?  ' sorting__link--active' : ''?>"
+              href="?<?= http_build_query(['sort' => 'likes_count', 'tab' => $tab ?? '']) ?>"
             >
               <span>Лайки</span>
               <svg class="sorting__icon" width="10" height="12">
@@ -65,7 +72,7 @@
                 <li class="popular__filters-item filters__item">
                   <a
                     class="filters__button button filters__button--<?= $type . $active_class ?>"
-                    href="?<?= http_build_query(['tab' => $id, 'sort' => $sort ?? '']) ?>"
+                    href="?tab=<?= $id ?>"
                   >
                   <span class="visually-hidden">
                     <?= $name ?>
@@ -183,6 +190,26 @@
           </article>
         <?php endforeach; ?>
       </div>
+      <?php if ($need_pagination): ?>
+        <div class="popular__page-links">
+          <a
+            <?= !$prev_page_link ? 'style="pointer-events: none"' : ''  ?>
+            class="popular__page-link popular__page-link--prev button button--gray"
+            href="<?= $prev_page_link ?>"
+          >
+            Предыдущая страница
+          </a>
+          <a
+            <?= !$next_page_link ? 'style="pointer-events: none"' : ''  ?>
+            class="popular__page-link popular__page-link--next button button--gray"
+            href="<?= $next_page_link ?>"
+          >
+            Следующая страница
+          </a>
+        </div>
+      <?php endif; ?>
+    <?php else: ?>
+      Постов нет
     <?php endif; ?>
   </div>
 </section>

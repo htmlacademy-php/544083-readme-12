@@ -126,16 +126,26 @@ function db_get_post_types(mysqli $link): ?array
  * Возвращает список постов
  *
  * @param $link mysqli Ресурс соединения
- * @param $tab int | string
+ * @param $tab int|string
  * @param $is_all_tab boolean
- * @param $sort string|null
- * @param  $user_id int|null
- *
+ * @param $sort ?string
+ * @param $user_id ?int
+ * @param $limit ?int
+ * @param $offset ?int
  * @return ?array
  */
-function db_get_posts(mysqli $link, int|string $tab, bool $is_all_tab, string $sort = null, int $user_id = null): ?array
+function db_get_posts(
+  mysqli $link,
+  int|string $tab,
+  bool $is_all_tab,
+  string $sort = null,
+  int $user_id = null,
+  int $limit = null,
+  int $offset = null): ?array
 {
   $sql_filter = !$is_all_tab ? "WHERE pt.id = ?" : '';
+
+  $stmt_params = !$is_all_tab ? [$tab] : [];
 
   if ($user_id !== null) {
     if ($sql_filter !== '') {
@@ -145,10 +155,19 @@ function db_get_posts(mysqli $link, int|string $tab, bool $is_all_tab, string $s
     }
   }
 
+  if (is_null($sort)) {
+    $sort = '';
+  } else {
+    $sort = mysqli_real_escape_string($link, $sort);
+    $sort = "ORDER BY $sort DESC";
+  }
 
-  $sort = is_null($sort) ? '' : "ORDER BY $sort DESC";
+  $sql_pagination = '';
+  if (is_int($limit) && is_int($offset)) {
+    $sql_pagination = "LIMIT ? OFFSET ?";
+    $stmt_params = array_merge($stmt_params, [$limit, $offset]);
+  }
 
-  $sort = mysqli_real_escape_string($link, $sort);
   $sql =
     "
     SELECT
@@ -172,8 +191,9 @@ function db_get_posts(mysqli $link, int|string $tab, bool $is_all_tab, string $s
     $sql_filter
     GROUP BY p.id
     $sort
+    $sql_pagination
   ";
-  $stmt = db_get_prepare_stmt($link, $sql, !$is_all_tab ? [$tab] : []);
+  $stmt = db_get_prepare_stmt($link, $sql, $stmt_params);
 
   return db_get_fetch_all($link, $stmt);
 }
