@@ -21,7 +21,7 @@ $values = [];
 
 if (count($_POST) > 0) {
   $errors = get_errors_post_form($_POST, $_FILES);
-  if (count($errors) === 0) {
+  if (isset($_POST['type']) && $_POST['type'] === 'photo') {
     $move_file = move_download_file($_FILES['post-photo'] ?? []);
     if ($move_file === '') {
       $errors['post-photo'] = [
@@ -37,16 +37,14 @@ if (count($_POST) > 0) {
         ];
       }
     }
-
-    if (count($errors) === 0) {
-      $type_id = array_search($_POST['type'] ?? [], $types);
-      $post_id = db_add_post($con, $_POST, $move_file ?? '', $put_file ?? '', $type_id, $_SESSION['user']['id']);
-      include_server_error_page($post_id);
-      header("location: post.php?id=$post_id");
-    }
   }
 
-  if (count($errors) !== 0) {
+  if (count($errors) === 0) {
+    $type_id = array_search($_POST['type'] ?? [], $types);
+    $post_id = db_add_post($con, $_POST, $move_file ?? '', $put_file ?? '', $type_id, $_SESSION['user']['id']);
+    include_server_error_page($post_id);
+    header("location: post.php?id=$post_id");
+  } else {
     foreach($_POST as $key => $post) {
       $values[$key] = htmlspecialchars($post);
     }

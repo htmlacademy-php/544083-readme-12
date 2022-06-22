@@ -4,6 +4,9 @@ CREATE DATABASE readme
 
 USE readme;
 
+SET GLOBAL time_zone = 'Europe/Moscow';
+SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+
 CREATE TABLE users (
    id INT AUTO_INCREMENT PRIMARY KEY,
    email VARCHAR (128) NOT NULL UNIQUE,
@@ -70,8 +73,9 @@ CREATE TABLE comments (
 CREATE TABLE likes (
     user_id INT NOT NULL,
     post_id INT NOT NULL,
-    CONSTRAINT like_author_ref FOREIGN KEY (user_id) REFERENCES users (id),
-    CONSTRAINT like_post_ref FOREIGN KEY (post_id) REFERENCES posts (id),
+    dt_add TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT like_author_ref FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT like_post_ref FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, post_id)
 );
 

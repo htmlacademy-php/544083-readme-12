@@ -15,8 +15,8 @@ $class_name = $class_name ?? '';
   $author = htmlspecialchars($post['author']) ?? '';
   $id = $post['id'] ?? '';
   $dt_add = $post['dt_add'] ?? '';
-  $likes_count = $post['likes_count'] ?? 0;
-  $comments_count = $post['comments_count'] ?? 0;
+  $likes_count = count($post['likes'] ?? []);
+  $comments_count = count($post['comments'] ?? []);
   ?>
   <article class="<?= $class_name ?> post post-<?= $type ?>">
     <header class="post__header post__author">

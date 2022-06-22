@@ -91,19 +91,20 @@ $next_page_link = $next_page_link ?? null;
     <?php if (!empty($posts)): ?>
       <?php $current_time = time(); ?>
       <div class="popular__posts">
-        <?php foreach ($posts as $key => $post): ?>
+        <?php foreach ($posts as $post): ?>
           <?php
-          $title = htmlspecialchars($post['title']) ?? '';
+          $title = htmlspecialchars($post['title'] ?? '');
           $type = $post['type'] ?? '';
-          $text = htmlspecialchars($post['text']) ?? '';
-          $quote_author = htmlspecialchars($post['quote_author']) ?? '';
-          $link = htmlspecialchars($post['link']) ?? '';
-          $image = htmlspecialchars($post['image']) ?? '';
-          $avatar = htmlspecialchars($post['avatar']) ?? '';
-          $author = htmlspecialchars($post['author']) ?? '';
+          $text = htmlspecialchars($post['text']  ?? '');
+          $quote_author = htmlspecialchars($post['quote_author'] ?? '');
+          $link = htmlspecialchars($post['link'] ?? '');
+          $image = htmlspecialchars($post['image'] ?? '');
+          $avatar = htmlspecialchars($post['avatar'] ?? '');
+          $author = $post['author'] ?? '';
+          $author_id = $post['author_id'] ?? '';
           $id = $post['id'] ?? '';
-          $likes_count = $post['likes_count'] ?? 0;
-          $comments_count = $post['comments_count'] ?? 0;
+          $likes_count = count($post['likes'] ?? []);
+          $comments_count = count($post['comments'] ?? []);
           $dt_add = $post['dt_add'] ?? '';
           ?>
           <article class="popular__post post post-<?= $type ?>">
@@ -148,7 +149,11 @@ $next_page_link = $next_page_link ?? null;
             <?php endif; ?>
             <footer class="post__footer">
               <div class="post__author">
-                <a class="post__author-link" href="#" title="<?= $author ?>">
+                <a
+                  class="post__author-link"
+                  href="/profile.php?id=<?= $author_id ?>"
+                  title="<?= $author ?>"
+                >
                   <div class="post__avatar-wrapper">
                     <img class="post__author-avatar" src="img/<?= $avatar ?>" alt="Аватар пользователя <?= $author ?>">
                   </div>
@@ -166,7 +171,11 @@ $next_page_link = $next_page_link ?? null;
               </div>
               <div class="post__indicators">
                 <div class="post__buttons">
-                  <a class="post__indicator post__indicator--likes button" href="#" title="Лайк">
+                  <a
+                    class="post__indicator post__indicator--likes button"
+                    href="/like.php?post=<?= $id ?>"
+                    title="Лайк"
+                  >
                     <svg class="post__indicator-icon" width="20" height="17">
                       <use xlink:href="#icon-heart"></use>
                     </svg>
