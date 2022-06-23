@@ -211,7 +211,18 @@ function db_get_posts(
         $posts[$key]['hash_tags'] = array_column($hash_tags, 'name');
       }
 
-      $sql_likes = "SELECT user_id, dt_add FROM likes WHERE post_id = ?";
+      $sql_likes =
+        "
+          SELECT
+            l.user_id,
+            l.post_id,
+            l.dt_add,
+            u.avatar,
+            u.login
+          FROM likes l
+          JOIN users u ON u.id = l.user_id
+          WHERE post_id = ?
+        ";
       $stmt_likes = db_get_prepare_stmt($link, $sql_likes, [$post['id']]);
       $likes = db_get_fetch_all($link, $stmt_likes) ?? null;
 
@@ -367,6 +378,21 @@ function db_get_hash_tag_posts(mysqli $link, string $tag): ?array
   $stmt = db_get_prepare_stmt($link, $sql, [$tag]);
 
   return db_get_fetch_all($link, $stmt);
+}
+
+/**
+ * Возвращает посты у которых есть лайки
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $user_id int
+ * @return ?array
+ */
+function db_get_likes_posts (mysqli $link, int $user_id): ?array
+{
+  $sql =
+    "
+      SELECT 
+    ";
 }
 
 /**
@@ -616,4 +642,20 @@ function db_add_comment (mysqli $link, string $content, int $user_id, int $post_
   $content = trim($content);
   $sql = "INSERT INTO comments (content, author_id, post_id) VALUES ('$content', $user_id, $post_id)";
   return mysqli_query($link, $sql);
+}
+
+/**
+ * Проверяет является ли один пользователь подписчиком другого
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $following_id int
+ * @param $follower_id int
+ * @return ?array
+ */
+function db_is_following (mysqli $link, int $following_id, int $follower_id): ?array
+{
+  $sql = "SELECT following_id, follower_id FROM subscriptions WHERE following_id = ? AND follower_id = ?";
+  $stmt = db_get_prepare_stmt($link, $sql, [$following_id, $follower_id]);
+
+  return db_get_fetch_all($link, $stmt);
 }
