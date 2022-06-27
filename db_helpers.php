@@ -129,7 +129,7 @@ function db_get_post_types(mysqli $link): ?array
  * @param $tab int|string
  * @param $is_all_tab boolean
  * @param $sort ?string
- * @param $user_id ?int
+ * @param $user_ids ?array
  * @param $limit ?int
  * @param $offset ?int
  * @return ?array
@@ -139,7 +139,7 @@ function db_get_posts(
   int|string $tab,
   bool $is_all_tab,
   string $sort = null,
-  int $user_id = null,
+  array $user_ids = null,
   int $limit = null,
   int $offset = null): ?array
 {
@@ -147,12 +147,20 @@ function db_get_posts(
 
   $stmt_params = !$is_all_tab ? [$tab] : [];
 
-  if ($user_id !== null) {
-    if ($sql_filter !== '') {
-      $sql_filter = $sql_filter . " AND u.id = $user_id";
-    } else {
-      $sql_filter = "WHERE u.id = $user_id";
+  if ($user_ids !== null) {
+    $sql_filter_user = $is_all_tab ? "WHERE u.id = $user_ids[0]" : " AND (u.id = $user_ids[0]";
+
+    foreach ($user_ids as $key => $user_id) {
+      if ($key !== 0) {
+        $sql_filter_user = $sql_filter_user . " OR u.id = $user_id";
+      }
+
+      if ($key === count($user_ids) - 1) {
+        $sql_filter_user = $sql_filter_user . (!$is_all_tab ? ')' : '');
+      }
     }
+
+    $sql_filter = $sql_filter . $sql_filter_user;
   }
 
   if (is_null($sort)) {
@@ -192,6 +200,7 @@ function db_get_posts(
     $sort
     $sql_pagination
   ";
+
   $stmt = db_get_prepare_stmt($link, $sql, $stmt_params);
 
   $posts = db_get_fetch_all($link, $stmt);
@@ -661,14 +670,14 @@ function db_is_following (mysqli $link, int $following_id, int $follower_id): ?a
 }
 
 /**
- * Возвращает список подписчиеов и подписок
+ * Возвращает список подписчиков и подписок
  *
  * @param $link mysqli Ресурс соединения
  * @param $user_id int
- * @param $current_user_id int
+ * @param $current_user_id ?int
  * @return ?array
  */
-function db_get_subscriptions (mysqli $link, int $user_id, int $current_user_id): ?array
+function db_get_subscriptions (mysqli $link, int $user_id, ?int $current_user_id = null): ?array
 {
   $sql =
     "
@@ -690,7 +699,7 @@ function db_get_subscriptions (mysqli $link, int $user_id, int $current_user_id)
           $subscribe_user = db_get_user($link, $item);
           if ($subscribe_user) {
             $subscriptions[$key] = $subscribe_user;
-            $subscriptions[$key]['isFollowing'] = db_is_following($link, $subscriptions[$key]['id'], $current_user_id);
+            $subscriptions[$key]['isFollowing'] = db_is_following($link, $subscriptions[$key]['id'], $current_user_id ? $current_user_id : $user_id);
           } else {
             return null;
           }

@@ -20,7 +20,7 @@ include_server_error_page($current_user);
 
 $isFollowing = db_is_following($con, $user['id'], $current_user['id']);
 
-$posts = db_get_posts($con, 'all', 'true', null, $user_id);
+$posts = db_get_posts($con, 'all', 'true', null, [$user_id]);
 include_server_error_page(is_array($posts));
 
 $subscriptions = [];

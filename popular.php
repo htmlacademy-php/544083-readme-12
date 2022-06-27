@@ -18,8 +18,6 @@ $sort = $_GET['sort'] ?? 'views';
 
 $page = $_GET['page'] ?? null;
 
-$get_params = $_SERVER['QUERY_STRING'];
-
 $posts = db_get_posts($con, $tab, $is_all_tab, $sort);
 include_server_error_page(is_array($posts));
 
