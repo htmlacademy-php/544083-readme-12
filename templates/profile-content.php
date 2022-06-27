@@ -285,8 +285,11 @@ $current_time = time();
                         </a>
                         <div class="post-mini__action">
                           <span class="post-mini__activity user__additional">Лайкнул вашу публикацию</span>
-                          <time class="post-mini__time user__additional" datetime="<?= $user['dt_add'] ?>">
-                            <?= relative_time(time() - strtotime($user['dt_add'])) ?> назад
+                          <time
+                            class="post-mini__time user__additional"
+                            datetime="<?= $post['likes'][0]['dt_add'] ?>"
+                          >
+                            <?= relative_time(time() - strtotime($post['likes'][0]['dt_add'])) ?> назад
                           </time>
                         </div>
                       </div>

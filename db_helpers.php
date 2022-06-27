@@ -231,6 +231,7 @@ function db_get_posts(
           FROM likes l
           JOIN users u ON u.id = l.user_id
           WHERE post_id = ?
+          ORDER BY l.dt_add DESC
         ";
       $stmt_likes = db_get_prepare_stmt($link, $sql_likes, [$post['id']]);
       $likes = db_get_fetch_all($link, $stmt_likes) ?? null;
