@@ -23,16 +23,24 @@ $isFollowing = db_is_following($con, $user['id'], $current_user['id']);
 $posts = db_get_posts($con, 'all', 'true', null, $user_id);
 include_server_error_page(is_array($posts));
 
+$subscriptions = [];
+
 if ($tab === 'likes') {
   $posts = array_filter($posts, function($i) {
     return isset($i['likes']) && count($i['likes'] ?? []) > 0;
   });
 }
 
+if ($tab === 'subscriptions') {
+  $subscriptions = db_get_subscriptions($con, $user['id'], $current_user['id']);
+  include_server_error_page($subscriptions);
+}
+
 $page_content = include_template('profile-content.php', [
   'user' => $user,
   'posts' => $posts,
   'current_user' => $current_user,
+  'subscriptions' => $subscriptions,
   'isFollowing' => $isFollowing,
   'tab' => $tab,
 ]);

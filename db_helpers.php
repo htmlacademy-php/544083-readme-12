@@ -659,3 +659,45 @@ function db_is_following (mysqli $link, int $following_id, int $follower_id): ?a
 
   return db_get_fetch_all($link, $stmt);
 }
+
+/**
+ * Возвращает список подписчиеов и подписок
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $user_id int
+ * @param $current_user_id int
+ * @return ?array
+ */
+function db_get_subscriptions (mysqli $link, int $user_id, int $current_user_id): ?array
+{
+  $sql =
+    "
+        SELECT
+         following_id,
+         follower_id 
+        FROM subscriptions
+        WHERE following_id = ? OR follower_id = ?
+    ";
+  $stmt = db_get_prepare_stmt($link, $sql, [$user_id, $user_id]);
+
+  $subscriptions = [];
+  $results = db_get_fetch_all($link, $stmt);
+
+  if ($results) {
+    foreach ($results as $key => $result) {
+      foreach ($result as $item) {
+        if ($item !== $user_id) {
+          $subscribe_user = db_get_user($link, $item);
+          if ($subscribe_user) {
+            $subscriptions[$key] = $subscribe_user;
+            $subscriptions[$key]['isFollowing'] = db_is_following($link, $subscriptions[$key]['id'], $current_user_id);
+          } else {
+            return null;
+          }
+        }
+      }
+    }
+  }
+
+  return array_unique($subscriptions, SORT_REGULAR);
+}
