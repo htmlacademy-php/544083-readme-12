@@ -286,13 +286,12 @@ function db_get_post(mysqli $link, int $post_id): ?array
       p.views,
       p.author_id,
       pt.type,
-      (SELECT COUNT(post_id) FROM likes WHERE post_id = ?) as likes_count,
-      (SELECT COUNT(post_id) FROM comments WHERE post_id = ?) as comments_count
+      (SELECT COUNT(post_id) FROM likes WHERE post_id = ?) as likes_count
     FROM posts p
     JOIN post_types pt ON pt.id = p.type_id
     WHERE p.id = ?
   ";
-  $stmt_post = db_get_prepare_stmt($link, $sql_post, array_fill(0, 3, $post_id));
+  $stmt_post = db_get_prepare_stmt($link, $sql_post, array_fill(0, 2, $post_id));
   $post = db_get_fetch_all($link, $stmt_post)[0] ?? null;
 
   if ($post !== null) {
@@ -307,6 +306,25 @@ function db_get_post(mysqli $link, int $post_id): ?array
 
     if ($hash_tags !== null) {
       $post['hash_tags'] = array_column($hash_tags, 'name');
+    }
+
+    $sql_comments =
+      "
+        SELECT
+          c.content,
+          c.dt_add,
+          u.id as author_id,
+          u.login as author_name,
+          u.avatar
+        FROM comments c
+        JOIN users u ON c.author_id = u.id
+        WHERE c.post_id = ?
+      ";
+    $stmt_comments = db_get_prepare_stmt($link, $sql_comments, [$post_id]);
+    $comments = db_get_fetch_all($link, $stmt_comments) ?? null;
+
+    if ($comments !== null) {
+      $post['comments'] = $comments;
     }
   }
 

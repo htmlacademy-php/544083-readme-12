@@ -216,27 +216,34 @@ $current_time = time();
                       <div class="comments__list-wrapper">
                         <ul class="comments__list">
                           <?php foreach($comments as $comment): ?>
+                          <?php
+                            $author_id = $comment['author_id'] ?? '';
+                            $author_name = $comment['author_name'] ?? '';
+                            $avatar = $comment['avatar'] ?? '';
+                            $dt_add = $comment['dt_add'] ?? '';
+                            $content = htmlspecialchars($comment['content'] ?? '');
+                          ?>
                             <li class="comments__item user">
                               <div class="comments__avatar">
-                                <a class="user__avatar-link" href="/profile.php?id=<?= $comment['author_id'] ?? '' ?>">
-                                  <img class="comments__picture" src="img/<?= $comment['avatar'] ?? '' ?>" alt="Аватар пользователя">
+                                <a class="user__avatar-link" href="/profile.php?id=<?= $author_id ?>">
+                                  <img class="comments__picture" src="img/<?= $avatar ?>" alt="Аватар пользователя">
                                 </a>
                               </div>
                               <div class="comments__info">
                                 <div class="comments__name-wrapper">
-                                  <a class="comments__user-name" href="/profile.php?id=<?= $comment['author_id'] ?? '' ?>">
-                                    <span><?= $comment['author_name'] ?? '' ?></span>
+                                  <a class="comments__user-name" href="/profile.php?id=<?= $author_id ?>">
+                                    <span><?= $author_name ?></span>
                                   </a>
                                   <time
                                     class="comments__time"
-                                    datetime="<?= strtotime($comment['dt_add']) ?>"
-                                    title="<?= date_format(date_create($comment['dt_add']), 'd.m.Y H:m'); ?>"
+                                    datetime="<?= strtotime($dt_add) ?>"
+                                    title="<?= date_format(date_create($dt_add), 'd.m.Y H:m'); ?>"
                                   >
-                                    <?= relative_time($current_time - strtotime($comment['dt_add'])); ?> назад
+                                    <?= relative_time($current_time - strtotime($dt_add)); ?> назад
                                   </time>
                                 </div>
                                 <p class="comments__text">
-                                  <?= $comment['content'] ?>
+                                  <?= $content ?>
                                 </p>
                               </div>
                             </li>
