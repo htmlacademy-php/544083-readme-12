@@ -2,7 +2,7 @@
 $user = $user ?? [];
 $posts = $posts ?? [];
 $current_user = $current_user ?? [];
-$subscriptions = $subscriptions ?? [];
+$followings = $followings ?? [];
 $isFollowing = $isFollowing ?? null;
 $tab = $tab ?? null;
 $current_time = time();
@@ -69,7 +69,7 @@ $current_time = time();
             <li class="profile__tabs-item filters__item">
               <a
                 class="profile__tabs-link filters__button tabs__item button<?= add_class($tab === 'likes', 'filters__button--active') ?>"
-                href="/profile.php?id=<?= $user['id'] ?>&tab=<?= 'likes' ?>"
+                href="/profile.php?id=<?= $user['id'] ?>&tab=likes"
               >
                 Лайки
               </a>
@@ -173,7 +173,11 @@ $current_time = time();
                   <footer class="post__footer">
                     <div class="post__indicators">
                       <div class="post__buttons">
-                        <a class="post__indicator post__indicator--likes button" href="#" title="Лайк">
+                        <a
+                          class="post__indicator post__indicator--likes button"
+                          href="/like-add.php?post=<?= $id ?>"
+                          title="Лайк"
+                        >
                           <svg class="post__indicator-icon" width="20" height="17">
                             <use xlink:href="#icon-heart"></use>
                           </svg>
@@ -356,51 +360,51 @@ $current_time = time();
             <section class="profile__subscriptions tabs__content tabs__content--active">
               <h2 class="visually-hidden">Подписки</h2>
               <ul class="profile__subscriptions-list">
-                <?php foreach($subscriptions as $subscription): ?>
+                <?php foreach($followings as $following): ?>
                   <li class="post-mini post-mini--photo post user">
                     <div class="post-mini__user-info user__info">
                       <div class="post-mini__avatar user__avatar">
-                        <a class="user__avatar-link" href="/profile.php?id=<?= $subscription['id'] ?? '' ?>">
-                          <img class="post-mini__picture user__picture" src="img/<?= $subscription['avatar'] ?? '' ?>" alt="Аватар пользователя">
+                        <a class="user__avatar-link" href="/profile.php?id=<?= $following['id'] ?? '' ?>">
+                          <img class="post-mini__picture user__picture" src="img/<?= $following['avatar'] ?? '' ?>" alt="Аватар пользователя">
                         </a>
                       </div>
                       <div class="post-mini__name-wrapper user__name-wrapper">
-                        <a class="post-mini__name user__name" href="/profile.php?id=<?= $subscription['id'] ?? '' ?>">
-                          <span><?= $subscription['login'] ?? '' ?></span>
+                        <a class="post-mini__name user__name" href="/profile.php?id=<?= $following['id'] ?? '' ?>">
+                          <span><?= $following['login'] ?? '' ?></span>
                         </a>
                         <time
                           class="post-mini__time user__additional"
-                          datetime="<?= strtotime($subscription['dt_add']) ?>"
-                          title="<?= date_format(date_create($subscription['dt_add']), 'd.m.Y H:m'); ?>"
+                          datetime="<?= strtotime($following['dt_add']) ?>"
+                          title="<?= date_format(date_create($following['dt_add']), 'd.m.Y H:m'); ?>"
                         >
-                          <?= relative_time($current_time - strtotime($subscription['dt_add'])); ?> на сайте
+                          <?= relative_time($current_time - strtotime($following['dt_add'])); ?> на сайте
                         </time>
                       </div>
                     </div>
                     <div class="post-mini__rating user__rating">
                       <p class="post-mini__rating-item user__rating-item user__rating-item--publications">
                         <span class="post-mini__rating-amount user__rating-amount">
-                          <?= $subscription['posts_count'] ?>
+                          <?= $following['posts_count'] ?>
                         </span>
                         <span class="post-mini__rating-text user__rating-text">
-                          <?= get_noun_plural_form($subscription['posts_count'], 'публикация', 'публикации', 'публикаций') ?>
+                          <?= get_noun_plural_form($following['posts_count'], 'публикация', 'публикации', 'публикаций') ?>
                         </span>
                       </p>
                       <p class="post-mini__rating-item user__rating-item user__rating-item--subscribers">
                         <span class="post-mini__rating-amount user__rating-amount">
-                          <?= $subscription['followers_count'] ?>
+                          <?= $following['followers_count'] ?>
                         </span>
                         <span class="post-mini__rating-text user__rating-text">
-                          <?= get_noun_plural_form($subscription['followers_count'], 'подписчик', 'подписчика', 'подписчиков') ?>
+                          <?= get_noun_plural_form($following['followers_count'], 'подписчик', 'подписчика', 'подписчиков') ?>
                         </span>
                       </p>
                     </div>
                     <div class="post-mini__user-buttons user__buttons">
                       <a
-                        class="post-mini__user-button user__button user__button--subscription button button--<?= $subscription['isFollowing'] ? 'quartz' : 'main' ?>"
-                        href="/subscription.php?id=<?= $subscription['id'] ?>"
+                        class="post-mini__user-button user__button user__button--subscription button button--<?= $following['isCurrentUserFollowing'] ? 'quartz' : 'main' ?>"
+                        href="/subscription.php?id=<?= $following['id'] ?>"
                       >
-                        <?= $subscription['isFollowing'] ? 'Отписаться' : 'Подписаться' ?>
+                        <?= $following['isCurrentUserFollowing'] ? 'Отписаться' : 'Подписаться' ?>
                       </a>
                     </div>
                   </li>

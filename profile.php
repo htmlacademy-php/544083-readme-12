@@ -15,32 +15,34 @@ $tab = $_GET['tab'] ?? null;
 $user = db_get_user($con, $user_id);
 include_not_found_page($user);
 
-$current_user = db_get_user($con, $_SESSION['user']['id']);
-include_server_error_page($current_user);
-
-$isFollowing = db_is_following($con, $user['id'], $current_user['id']);
+$isFollowing = db_is_following($con, $user['id'], $_SESSION['user']['id']);
 
 $posts = db_get_posts($con, 'all', 'true', null, [$user_id]);
 include_server_error_page(is_array($posts));
 
-$subscriptions = [];
+$followings = [];
 
 if ($tab === 'likes') {
-  $posts = array_filter($posts, function($i) {
-    return isset($i['likes']) && count($i['likes'] ?? []) > 0;
-  });
+  $posts = array_filter(
+    $posts,
+    static fn (array $item): bool => isset($item['likes']) && count($item['likes'] ?? []) > 0
+  );
 }
 
 if ($tab === 'subscriptions') {
-  $subscriptions = db_get_subscriptions($con, $user['id'], $current_user['id']);
-  include_server_error_page($subscriptions);
+  $followings = db_get_followings($con, $user['id']);
+  include_server_error_page(is_array($followings));
+
+  foreach ($followings as $key => $following) {
+    $followings[$key]['isCurrentUserFollowing'] = db_is_following($con, $following['id'], $_SESSION['user']['id']);
+  }
 }
 
 $page_content = include_template('profile-content.php', [
   'user' => $user,
   'posts' => $posts,
-  'current_user' => $current_user,
-  'subscriptions' => $subscriptions,
+  'current_user' => $_SESSION['user'],
+  'followings' => $followings,
   'isFollowing' => $isFollowing,
   'tab' => $tab,
 ]);

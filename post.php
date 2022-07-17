@@ -25,15 +25,12 @@ $post_author_id =  $post['author_id'] ?? '';
 $user = db_get_user($con, $post_author_id);
 include_server_error_page($user);
 
-$current_user = db_get_user($con, $_SESSION['user']['id']);
-include_server_error_page($current_user);
-
-$isFollowing = db_is_following($con, $user['id'], $current_user['id']);
+$isFollowing = db_is_following($con, $user['id'], $_SESSION['user']['id']);
 
 $page_content = include_template('post-details.php', [
   'post' => $post,
   'user' => $user,
-  'current_user' => $current_user,
+  'current_user' => $_SESSION['user'],
   'isFollowing' => $isFollowing,
 ]);
 

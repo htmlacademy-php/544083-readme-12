@@ -141,26 +141,20 @@ function db_get_posts(
   string $sort = null,
   array $user_ids = null,
   int $limit = null,
-  int $offset = null): ?array
-{
+  int $offset = null
+): ?array {
   $sql_filter = !$is_all_tab ? "WHERE pt.id = ?" : '';
 
   $stmt_params = !$is_all_tab ? [$tab] : [];
 
   if ($user_ids !== null) {
-    $sql_filter_user = $is_all_tab ? "WHERE u.id = $user_ids[0]" : " AND (u.id = $user_ids[0]";
+    $sql_filter_user = $is_all_tab ? "WHERE u.id IN (" : " AND (u.id IN (";
 
-    foreach ($user_ids as $key => $user_id) {
-      if ($key !== 0) {
-        $sql_filter_user = $sql_filter_user . " OR u.id = $user_id";
-      }
+    $sql_filter_user .= implode(',', $user_ids);
 
-      if ($key === count($user_ids) - 1) {
-        $sql_filter_user = $sql_filter_user . (!$is_all_tab ? ')' : '');
-      }
-    }
+    $sql_filter_user .= $is_all_tab ? ')' : '))';
 
-    $sql_filter = $sql_filter . $sql_filter_user;
+    $sql_filter .= $sql_filter_user;
   }
 
   if (is_null($sort)) {
@@ -224,7 +218,6 @@ function db_get_posts(
         "
           SELECT
             l.user_id,
-            l.post_id,
             l.dt_add,
             u.avatar,
             u.login
@@ -291,7 +284,7 @@ function db_get_post(mysqli $link, int $post_id): ?array
     JOIN post_types pt ON pt.id = p.type_id
     WHERE p.id = ?
   ";
-  $stmt_post = db_get_prepare_stmt($link, $sql_post, array_fill(0, 2, $post_id));
+  $stmt_post = db_get_prepare_stmt($link, $sql_post, [$post_id, $post_id]);
   $post = db_get_fetch_all($link, $stmt_post)[0] ?? null;
 
   if ($post !== null) {
@@ -409,21 +402,6 @@ function db_get_hash_tag_posts(mysqli $link, string $tag): ?array
 }
 
 /**
- * Возвращает посты у которых есть лайки
- *
- * @param $link mysqli Ресурс соединения
- * @param $user_id int
- * @return ?array
- */
-function db_get_likes_posts (mysqli $link, int $user_id): ?array
-{
-  $sql =
-    "
-      SELECT 
-    ";
-}
-
-/**
  * Возвращает автора поста
  *
  * @param $link mysqli Ресурс соединения
@@ -445,7 +423,7 @@ function db_get_user(mysqli $link, int $id): ?array
     FROM users u
     WHERE u.id = ?
   ";
-  $stmt = db_get_prepare_stmt($link, $sql, array_fill(0, 3, $id));
+  $stmt = db_get_prepare_stmt($link, $sql, [$id, $id, $id]);
 
   return db_get_fetch_all($link, $stmt)[0] ?? null;
 }
@@ -595,6 +573,24 @@ function db_get_login_user (mysqli $link, string $login): ?array
 }
 
 /**
+ * Проверяет поставил ли юзер like
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $post_id int
+ * @param $user_id int
+ * @return bool
+ */
+
+function db_is_post_liked (mysqli $link, int $user_id, int $post_id): bool
+{
+  $sql = "SELECT user_id FROM likes WHERE user_id = ? AND post_id = ?";
+  $stmt = db_get_prepare_stmt($link, $sql, [$user_id, $post_id]);
+  $result = db_get_fetch_all($link, $stmt);
+
+  return is_array($result) && count($result) > 0;
+}
+
+/**
  * Добавляет like
  *
  * @param $link mysqli Ресурс соединения
@@ -608,9 +604,31 @@ function db_add_post_like (mysqli $link, int $user_id, int $post_id): bool
   $result = mysqli_query($link, $sql);
 
   if (!$result) {
-    $sql = "DELETE FROM likes WHERE user_id = $user_id AND post_id = $post_id";
-    $result = mysqli_query($link, $sql);
-  };
+    if (IS_DEBUGGING) {
+      die(mysqli_error($link));
+    }
+  }
+
+  return $result;
+}
+
+/**
+ * Удаляет like
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $post_id int
+ * @param $user_id int
+ * @return bool
+ */
+function db_delete_post_like (mysqli $link, int $user_id, int $post_id): bool
+{
+  $sql = "DELETE FROM likes WHERE user_id = $user_id AND post_id = $post_id";
+
+  $result = mysqli_query($link, $sql);
+
+  if (!$result && IS_DEBUGGING) {
+    die(mysqli_error($link));
+  }
 
   return $result;
 }
@@ -625,7 +643,14 @@ function db_add_post_like (mysqli $link, int $user_id, int $post_id): bool
 function db_add_post_view (mysqli $link, int $post_id): bool
 {
   $sql = "UPDATE posts SET views = views + 1 WHERE id = $post_id";
-  return mysqli_query($link, $sql);
+
+  $result = mysqli_query($link, $sql);
+
+  if (!$result && IS_DEBUGGING) {
+    die(mysqli_error($link));
+  }
+
+  return $result;
 }
 
 /**
@@ -669,7 +694,13 @@ function db_add_comment (mysqli $link, string $content, int $user_id, int $post_
 {
   $content = trim($content);
   $sql = "INSERT INTO comments (content, author_id, post_id) VALUES ('$content', $user_id, $post_id)";
-  return mysqli_query($link, $sql);
+  $result = mysqli_query($link, $sql);
+
+  if (!$result && IS_DEBUGGING) {
+    die(mysqli_error($link));
+  }
+
+  return $result;
 }
 
 /**
@@ -689,43 +720,71 @@ function db_is_following (mysqli $link, int $following_id, int $follower_id): ?a
 }
 
 /**
+ * Добавляет подписчка
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $following_id int
+ * @param $follower_id int
+ * @return bool
+ */
+function db_add_following (mysqli $link, int $following_id, int $follower_id): bool
+{
+  $sql = "INSERT INTO subscriptions (following_id, follower_id) VALUES ($following_id, $follower_id)";
+
+  $result = mysqli_query($link, $sql);
+
+  if (!$result && IS_DEBUGGING) {
+    die(mysqli_error($link));
+  }
+
+  return $result;
+}
+
+/**
+ * Удаляет подписчка
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $following_id int
+ * @param $follower_id int
+ * @return bool
+ */
+function db_delete_follower (mysqli $link, int $following_id, int $follower_id): bool
+{
+  $sql = "DELETE FROM subscriptions WHERE following_id = $following_id AND follower_id = $follower_id";
+
+  $result = mysqli_query($link, $sql);
+
+  if (!$result && IS_DEBUGGING) {
+    die(mysqli_error($link));
+  }
+
+  return $result;
+}
+
+/**
  * Возвращает список подписчиков и подписок
  *
  * @param $link mysqli Ресурс соединения
  * @param $user_id int
- * @param $current_user_id ?int
- * @return ?array
+ * @return array
  */
-function db_get_subscriptions (mysqli $link, int $user_id, ?int $current_user_id = null): ?array
+function db_get_followings (mysqli $link, int $user_id): array
 {
   $sql =
     "
         SELECT
-         following_id,
-         follower_id 
-        FROM subscriptions
-        WHERE following_id = ? OR follower_id = ?
+         s.following_id as id,
+         u.login,
+         u.avatar,
+         u.dt_add,
+         (SELECT COUNT(sb.follower_id) FROM subscriptions sb WHERE sb.following_id = s.following_id) as followers_count,
+         (SELECT COUNT(id) FROM posts WHERE author_id = s.following_id) as posts_count
+        FROM subscriptions s
+        JOIN users u ON u.id = s.following_id
+        WHERE follower_id = ?
     ";
-  $stmt = db_get_prepare_stmt($link, $sql, [$user_id, $user_id]);
 
-  $subscriptions = [];
-  $results = db_get_fetch_all($link, $stmt);
+  $stmt = db_get_prepare_stmt($link, $sql, [$user_id]);
 
-  if ($results) {
-    foreach ($results as $key => $result) {
-      foreach ($result as $item) {
-        if ($item !== $user_id) {
-          $subscribe_user = db_get_user($link, $item);
-          if ($subscribe_user) {
-            $subscriptions[$key] = $subscribe_user;
-            $subscriptions[$key]['isFollowing'] = db_is_following($link, $subscriptions[$key]['id'], $current_user_id ? $current_user_id : $user_id);
-          } else {
-            return null;
-          }
-        }
-      }
-    }
-  }
-
-  return array_unique($subscriptions, SORT_REGULAR);
+  return db_get_fetch_all($link, $stmt);
 }

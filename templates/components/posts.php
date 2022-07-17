@@ -108,7 +108,7 @@ $class_name = $class_name ?? '';
       <div class="post__buttons">
         <a
           class="post__indicator post__indicator--likes button"
-          href="/like.php?post=<?= $id ?>"
+          href="/like-add.php?post=<?= $id ?>"
           title="Лайк"
         >
           <svg class="post__indicator-icon" width="20" height="17">
