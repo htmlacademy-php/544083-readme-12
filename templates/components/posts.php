@@ -12,15 +12,20 @@ $class_name = $class_name ?? '';
   $link = htmlspecialchars($post['link']) ?? '';
   $image = htmlspecialchars($post['image']) ?? '';
   $avatar = htmlspecialchars($post['avatar']) ?? '';
-  $author = htmlspecialchars($post['author']) ?? '';
+  $author = $post['author'] ?? '';
+  $author_id = $post['author_id'] ?? '';
   $id = $post['id'] ?? '';
   $dt_add = $post['dt_add'] ?? '';
-  $likes_count = $post['likes_count'] ?? 0;
-  $comments_count = $post['comments_count'] ?? 0;
+  $likes_count = count($post['likes'] ?? []);
+  $comments_count = count($post['comments'] ?? []);
   ?>
   <article class="<?= $class_name ?> post post-<?= $type ?>">
     <header class="post__header post__author">
-      <a class="post__author-link" href="#" title="Автор">
+      <a
+        class="post__author-link"
+        href="/profile.php?id=<?= $author_id ?>"
+        title="Автор"
+      >
         <div class="post__avatar-wrapper">
           <img
             class="post__author-avatar"
@@ -101,7 +106,11 @@ $class_name = $class_name ?? '';
     </div>
     <footer class="post__footer post__indicators">
       <div class="post__buttons">
-        <a class="post__indicator post__indicator--likes button" href="#" title="Лайк">
+        <a
+          class="post__indicator post__indicator--likes button"
+          href="/like-add.php?post=<?= $id ?>"
+          title="Лайк"
+        >
           <svg class="post__indicator-icon" width="20" height="17">
             <use xlink:href="#icon-heart"></use>
           </svg>

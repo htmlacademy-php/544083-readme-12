@@ -1,3 +1,10 @@
+<?php
+$get_params = $get_params ?? null;
+$need_pagination = $need_pagination ?? null;
+$prev_page_link = $prev_page_link ?? null;
+$next_page_link = $next_page_link ?? null;
+?>
+
 <section class="page__main page__main--popular">
   <div class="container">
     <h1 class="page__title page__title--popular">Популярное</h1>
@@ -20,8 +27,8 @@
           </li>
           <li class="sorting__item">
             <a
-              class="sorting__link<?= ($sort ?? '') === 'likes' ?  ' sorting__link--active' : ''?>"
-              href="?<?= http_build_query(['sort' => 'likes', 'tab' => $tab ?? '']) ?>"
+              class="sorting__link<?= ($sort ?? '') === 'likes_count' ?  ' sorting__link--active' : ''?>"
+              href="?<?= http_build_query(['sort' => 'likes_count', 'tab' => $tab ?? '']) ?>"
             >
               <span>Лайки</span>
               <svg class="sorting__icon" width="10" height="12">
@@ -65,7 +72,7 @@
                 <li class="popular__filters-item filters__item">
                   <a
                     class="filters__button button filters__button--<?= $type . $active_class ?>"
-                    href="?<?= http_build_query(['tab' => $id, 'sort' => $sort ?? '']) ?>"
+                    href="?tab=<?= $id ?>"
                   >
                   <span class="visually-hidden">
                     <?= $name ?>
@@ -84,19 +91,20 @@
     <?php if (!empty($posts)): ?>
       <?php $current_time = time(); ?>
       <div class="popular__posts">
-        <?php foreach ($posts as $key => $post): ?>
+        <?php foreach ($posts as $post): ?>
           <?php
-          $title = htmlspecialchars($post['title']) ?? '';
+          $title = htmlspecialchars($post['title'] ?? '');
           $type = $post['type'] ?? '';
-          $text = htmlspecialchars($post['text']) ?? '';
-          $quote_author = htmlspecialchars($post['quote_author']) ?? '';
-          $link = htmlspecialchars($post['link']) ?? '';
-          $image = htmlspecialchars($post['image']) ?? '';
-          $avatar = htmlspecialchars($post['avatar']) ?? '';
-          $author = htmlspecialchars($post['author']) ?? '';
+          $text = htmlspecialchars($post['text']  ?? '');
+          $quote_author = htmlspecialchars($post['quote_author'] ?? '');
+          $link = htmlspecialchars($post['link'] ?? '');
+          $image = htmlspecialchars($post['image'] ?? '');
+          $avatar = htmlspecialchars($post['avatar'] ?? '');
+          $author = $post['author'] ?? '';
+          $author_id = $post['author_id'] ?? '';
           $id = $post['id'] ?? '';
-          $likes_count = $post['likes_count'] ?? 0;
-          $comments_count = $post['comments_count'] ?? 0;
+          $likes_count = count($post['likes'] ?? []);
+          $comments_count = count($post['comments'] ?? []);
           $dt_add = $post['dt_add'] ?? '';
           ?>
           <article class="popular__post post post-<?= $type ?>">
@@ -141,7 +149,11 @@
             <?php endif; ?>
             <footer class="post__footer">
               <div class="post__author">
-                <a class="post__author-link" href="#" title="<?= $author ?>">
+                <a
+                  class="post__author-link"
+                  href="/profile.php?id=<?= $author_id ?>"
+                  title="<?= $author ?>"
+                >
                   <div class="post__avatar-wrapper">
                     <img class="post__author-avatar" src="img/<?= $avatar ?>" alt="Аватар пользователя <?= $author ?>">
                   </div>
@@ -159,7 +171,11 @@
               </div>
               <div class="post__indicators">
                 <div class="post__buttons">
-                  <a class="post__indicator post__indicator--likes button" href="#" title="Лайк">
+                  <a
+                    class="post__indicator post__indicator--likes button"
+                    href="/like-add.php?post=<?= $id ?>"
+                    title="Лайк"
+                  >
                     <svg class="post__indicator-icon" width="20" height="17">
                       <use xlink:href="#icon-heart"></use>
                     </svg>
@@ -183,6 +199,26 @@
           </article>
         <?php endforeach; ?>
       </div>
+      <?php if ($need_pagination): ?>
+        <div class="popular__page-links">
+          <a
+            <?= !$prev_page_link ? 'style="pointer-events: none"' : ''  ?>
+            class="popular__page-link popular__page-link--prev button button--gray"
+            href="<?= $prev_page_link ?>"
+          >
+            Предыдущая страница
+          </a>
+          <a
+            <?= !$next_page_link ? 'style="pointer-events: none"' : ''  ?>
+            class="popular__page-link popular__page-link--next button button--gray"
+            href="<?= $next_page_link ?>"
+          >
+            Следующая страница
+          </a>
+        </div>
+      <?php endif; ?>
+    <?php else: ?>
+      Постов нет
     <?php endif; ?>
   </div>
 </section>

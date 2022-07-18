@@ -1,6 +1,9 @@
 <?php
 $post = $post ?? [];
 $user = $user ?? [];
+$current_user = $current_user ?? [];
+$isFollowing = $isFollowing ?? null;
+$current_time = time();
 ?>
 
 <main class="page__main page__main--publication">
@@ -61,7 +64,11 @@ $user = $user ?? [];
           <?php endif; ?>
           <div class="post__indicators">
             <div class="post__buttons">
-              <a class="post__indicator post__indicator--likes button" href="#" title="Лайк">
+              <a
+                class="post__indicator post__indicator--likes button"
+                href="/like-add.php?post=<?= $post['id'] ?? '' ?>"
+                title="Лайк"
+              >
                 <svg class="post__indicator-icon" width="20" height="17">
                   <use xlink:href="#icon-heart"></use>
                 </svg>
@@ -78,7 +85,7 @@ $user = $user ?? [];
                   <use xlink:href="#icon-comment"></use>
                 </svg>
                 <span>
-                  <?= $post['comments_count'] ?? '' ?>
+                  <?= count($post['comments'] ?? []) ?>
                 </span>
                 <span class="visually-hidden">количество комментариев</span>
               </a>
@@ -109,65 +116,56 @@ $user = $user ?? [];
             </ul>
           <?php endif; ?>
           <div class="comments">
-            <form class="comments__form form" action="#" method="post">
+            <form class="comments__form form" action="/comment-add.php" method="post">
               <div class="comments__my-avatar">
-                <img class="comments__picture" src="img/userpic-medium.jpg" alt="Аватар пользователя">
+                <img class="comments__picture" src="img/<?= $current_user['avatar'] ?>" alt="Аватар пользователя">
               </div>
-              <div class="form__input-section form__input-section--error">
-                <textarea class="comments__textarea form__textarea form__input" placeholder="Ваш комментарий"></textarea>
-                <label class="visually-hidden">Ваш комментарий</label>
-                <button class="form__error-button button" type="button">!</button>
-                <div class="form__error-text">
-                  <h3 class="form__error-title">Ошибка валидации</h3>
-                  <p class="form__error-desc">Это поле обязательно к заполнению</p>
-                </div>
-              </div>
+              <input type="hidden" name="post-id" value="<?= $post['id'] ?? '' ?>">
+              <input type="hidden" name="user-id" value="<?= $current_user['id'] ?>">
+              <input type="hidden" name="author-id" value="<?= $post['author_id'] ?>">
+              <textarea name="comment-content" class="comments__textarea form__textarea" placeholder="Ваш комментарий"></textarea>
+              <label class="visually-hidden">Ваш комментарий</label>
               <button class="comments__submit button button--green" type="submit">Отправить</button>
             </form>
-            <div class="comments__list-wrapper">
-              <ul class="comments__list">
-                <li class="comments__item user">
-                  <div class="comments__avatar">
-                    <a class="user__avatar-link" href="#">
-                      <img class="comments__picture" src="img/userpic-larisa.jpg" alt="Аватар пользователя">
-                    </a>
-                  </div>
-                  <div class="comments__info">
-                    <div class="comments__name-wrapper">
-                      <a class="comments__user-name" href="#">
-                        <span>Лариса Роговая</span>
-                      </a>
-                      <time class="comments__time" datetime="2019-03-20">1 ч назад</time>
-                    </div>
-                    <p class="comments__text">
-                      Красота!!!1!
-                    </p>
-                  </div>
-                </li>
-                <li class="comments__item user">
-                  <div class="comments__avatar">
-                    <a class="user__avatar-link" href="#">
-                      <img class="comments__picture" src="img/userpic-larisa.jpg" alt="Аватар пользователя">
-                    </a>
-                  </div>
-                  <div class="comments__info">
-                    <div class="comments__name-wrapper">
-                      <a class="comments__user-name" href="#">
-                        <span>Лариса Роговая</span>
-                      </a>
-                      <time class="comments__time" datetime="2019-03-18">2 дня назад</time>
-                    </div>
-                    <p class="comments__text">
-                      Озеро Байкал – огромное древнее озеро в горах Сибири к северу от монгольской границы. Байкал считается самым глубоким озером в мире. Он окружен сетью пешеходных маршрутов, называемых Большой байкальской тропой. Деревня Листвянка, расположенная на западном берегу озера, – популярная отправная точка для летних экскурсий. Зимой здесь можно кататься на коньках и собачьих упряжках.
-                    </p>
-                  </div>
-                </li>
-              </ul>
-              <a class="comments__more-link" href="#">
-                <span>Показать все комментарии</span>
-                <sup class="comments__amount">45</sup>
-              </a>
-            </div>
+            <?php if(count($post['comments']) > 0): ?>
+              <div class="comments__list-wrapper">
+                <ul class="comments__list">
+                  <?php foreach($post['comments'] as $comment): ?>
+                    <?php
+                    $author_id = $comment['author_id'] ?? '';
+                    $author_name = $comment['author_name'] ?? '';
+                    $avatar = $comment['avatar'] ?? '';
+                    $dt_add = $comment['dt_add'] ?? '';
+                    $content = htmlspecialchars($comment['content'] ?? '');
+                    ?>
+                    <li class="comments__item user">
+                      <div class="comments__avatar">
+                        <a class="user__avatar-link" href="/profile.php?id=<?= $author_id ?>">
+                          <img class="comments__picture" src="img/<?= $avatar ?>" alt="Аватар пользователя">
+                        </a>
+                      </div>
+                      <div class="comments__info">
+                        <div class="comments__name-wrapper">
+                          <a class="comments__user-name" href="/profile.php?id=<?= $author_id ?>">
+                            <span><?= $author_name ?></span>
+                          </a>
+                          <time
+                            class="comments__time"
+                            datetime="<?= strtotime($dt_add) ?>"
+                            title="<?= date_format(date_create($dt_add), 'd.m.Y H:m'); ?>"
+                          >
+                            <?= relative_time($current_time - strtotime($dt_add)); ?> назад
+                          </time>
+                        </div>
+                        <p class="comments__text">
+                          <?= $content ?>
+                        </p>
+                      </div>
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
+            <?php endif; ?>
           </div>
         </div>
         <div class="post-details__user user">
@@ -212,7 +210,12 @@ $user = $user ?? [];
             </p>
           </div>
           <div class="post-details__user-buttons user__buttons">
-            <button class="user__button user__button--subscription button button--main" type="button">Подписаться</button>
+            <a
+              href="/subscription.php?id=<?= $user['id'] ?>"
+              class="user__button user__button--subscription button button--main"
+            >
+              <?= $isFollowing ? 'Отписаться' : 'Подписаться' ?>
+            </a>
             <a class="user__button user__button--writing button button--green" href="#">Сообщение</a>
           </div>
         </div>
