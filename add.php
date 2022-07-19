@@ -5,9 +5,9 @@ require_once('helpers.php');
 require_once('db_helpers.php');
 require_once('validator.php');
 require_once('init.php');
+require_once ('send-mail.php');
 
 $con = $con ?? null;
-
 $post_types = db_get_post_types($con);
 include_server_error_page($post_types);
 
@@ -43,6 +43,16 @@ if (count($_POST) > 0) {
     $type_id = array_search($_POST['type'] ?? [], $types);
     $post_id = db_add_post($con, $_POST, $move_file ?? '', $put_file ?? '', $type_id, $_SESSION['user']['id']);
     include_server_error_page($post_id);
+    $followers = db_get_followers($con, $_SESSION['user']['id']);
+    if (is_array($followers) && count($followers) > 0) {
+      $subject = "Новая публикация от пользователя {$_SESSION['user']['login']}";
+      $href = "http://readme/profile.php?id={$_SESSION['user']['id']}";
+      $link = sprintf('<a href="%s">%s</a>', $href, $href);
+      foreach ($followers as $follower) {
+        $body = "Здравствуйте, {$follower['login']}. Пользователь {$_SESSION['user']['login']} только что опубликовал новую запись „{$_POST['post-title']}“. Посмотрите её на странице пользователя: $link";
+        send_mail($follower['email'], $subject, $body);
+      }
+    }
     header("location: post.php?id=$post_id");
   } else {
     foreach($_POST as $key => $post) {

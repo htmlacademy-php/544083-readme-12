@@ -416,6 +416,7 @@ function db_get_user(mysqli $link, int $id): ?array
     SELECT
       u.id,
       u.login,
+      u.email,
       u.dt_add,
       u.avatar,
       (SELECT COUNT(follower_id) FROM subscriptions WHERE following_id = ?) as followers_count,
@@ -748,7 +749,7 @@ function db_add_following (mysqli $link, int $following_id, int $follower_id): b
  * @param $follower_id int
  * @return bool
  */
-function db_delete_follower (mysqli $link, int $following_id, int $follower_id): bool
+function db_delete_following (mysqli $link, int $following_id, int $follower_id): bool
 {
   $sql = "DELETE FROM subscriptions WHERE following_id = $following_id AND follower_id = $follower_id";
 
@@ -762,7 +763,7 @@ function db_delete_follower (mysqli $link, int $following_id, int $follower_id):
 }
 
 /**
- * Возвращает список подписчиков и подписок
+ * Возвращает список подписок
  *
  * @param $link mysqli Ресурс соединения
  * @param $user_id int
@@ -782,6 +783,35 @@ function db_get_followings (mysqli $link, int $user_id): array
         FROM subscriptions s
         JOIN users u ON u.id = s.following_id
         WHERE follower_id = ?
+    ";
+
+  $stmt = db_get_prepare_stmt($link, $sql, [$user_id]);
+
+  return db_get_fetch_all($link, $stmt);
+}
+
+/**
+ * Возвращает список подписччико
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $user_id int
+ * @return array
+ */
+function db_get_followers (mysqli $link, int $user_id): array
+{
+  $sql =
+    "
+        SELECT
+         s.follower_id as id,
+         u.login,
+         u.email,
+         u.avatar,
+         u.dt_add,
+         (SELECT COUNT(sb.follower_id) FROM subscriptions sb WHERE sb.following_id = s.follower_id) as followers_count,
+         (SELECT COUNT(id) FROM posts WHERE author_id = s.follower_id) as posts_count
+        FROM subscriptions s
+        JOIN users u ON u.id = s.follower_id
+        WHERE following_id = ?
     ";
 
   $stmt = db_get_prepare_stmt($link, $sql, [$user_id]);

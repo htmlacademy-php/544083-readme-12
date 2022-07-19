@@ -17,7 +17,7 @@ include_not_found_page($user);
 
 $isFollowing = db_is_following($con, $user['id'], $_SESSION['user']['id']);
 
-$posts = db_get_posts($con, 'all', 'true', null, [$user_id]);
+$posts = db_get_posts($con, 'all', 'true', 'dt_add', [$user_id]);
 include_server_error_page(is_array($posts));
 
 $followings = [];
