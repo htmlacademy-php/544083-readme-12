@@ -60,6 +60,7 @@ $layout_content = include_template('layout.php', [
   'content' => $page_content,
   'user' => $_SESSION['user'],
   'page' => 'popular',
+  'unread_messages' => $unread_messages ?? 0,
 ]);
 
 print($layout_content);

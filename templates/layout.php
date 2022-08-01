@@ -4,6 +4,7 @@ $is_auth = count($user) > 0;
 $page = $page ?? '';
 $isFeedPage = $page === 'feed';
 $isPopularPage = $page === 'popular';
+$unread_messages = $unread_messages ?? 0;
 ?>
 
 <!DOCTYPE html>
@@ -160,7 +161,7 @@ $isPopularPage = $page === 'popular';
                 </a>
               </li>
               <li class="header__my-page header__my-page--messages">
-                <a class="header__page-link" href="messages.html" title="Личные сообщения">
+                <a class="header__page-link" href="/messages.php" title="Личные сообщения">
                   <span class="visually-hidden">Личные сообщения</span>
                 </a>
               </li>
@@ -195,10 +196,14 @@ $isPopularPage = $page === 'popular';
                         </a>
                       </li>
                       <li class="header__profile-nav-item">
-                        <a class="header__profile-nav-link" href="#">
+                        <a class="header__profile-nav-link" href="/messages.php">
                             <span class="header__profile-nav-text">
                               Сообщения
-                              <i class="header__profile-indicator">2</i>
+                              <?php if(boolval($unread_messages)): ?>
+                                <i class="header__profile-indicator">
+                                  <?= $unread_messages ?>
+                                </i>
+                              <?php endif; ?>
                             </span>
                         </a>
                       </li>

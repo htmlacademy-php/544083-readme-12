@@ -38,6 +38,7 @@ $layout_content = include_template('layout.php', [
   'title' => 'readme Пост',
   'content' => $page_content,
   'user' => $_SESSION['user'],
+  'unread_messages' => $unread_messages ?? 0,
 ]);
 
 print($layout_content);
