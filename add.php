@@ -1,10 +1,9 @@
 <?php
 require_once('session.php');
-require_once('enums.php');
+require_once('init.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
 require_once('validator.php');
-require_once('init.php');
 require_once ('send-mail.php');
 
 $con = $con ?? null;
@@ -46,7 +45,7 @@ if (count($_POST) > 0) {
     $followers = db_get_followers($con, $_SESSION['user']['id']);
     if (is_array($followers) && count($followers) > 0) {
       $subject = "Новая публикация от пользователя {$_SESSION['user']['login']}";
-      $href = "http://readme/profile.php?id={$_SESSION['user']['id']}";
+      $href = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/profile.php?id={$_SESSION['user']['id']}";
       $link = sprintf('<a href="%s">%s</a>', $href, $href);
       foreach ($followers as $follower) {
         $body = "Здравствуйте, {$follower['login']}. Пользователь {$_SESSION['user']['login']} только что опубликовал новую запись „{$_POST['post-title']}“. Посмотрите её на странице пользователя: $link";
@@ -72,7 +71,7 @@ $layout_content = include_template('layout.php', [
   'title' => 'Добавление поста',
   'content' => $page_content,
   'user' => $_SESSION['user'],
-  'unread_messages' => $unread_messages ?? 0
+  'unread_messages' =>  db_get_unread_message_count($con, $_SESSION['user']['id']),
 ]);
 
 print($layout_content);

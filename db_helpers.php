@@ -6,7 +6,7 @@
  * @param string $database
  * @return mysqli
  */
-function db_connect(string $host_name = 'localhost', string $username = 'root', string $password = '', string $database = 'readme'): mysqli
+function db_connect(string $host_name = HOST_NAME, string $username = DB_USERNAME, string $password = DB_PASSWORD, string $database = DB_NAME): mysqli
 {
   $con = mysqli_connect($host_name, $username, $password, $database);
   if ($con === false) {
@@ -897,7 +897,7 @@ function db_get_unread_message_count (mysqli $link, int $recipient_id): int
  *
  * @param $link mysqli Ресурс соединения
  * @param $recipient_id int
- * @param int $sender_id
+ * @param $sender_id int
  * @return bool
  */
 function db_set_read_messages (mysqli $link, int $sender_id, int $recipient_id): bool
@@ -924,11 +924,8 @@ function db_set_read_messages (mysqli $link, int $sender_id, int $recipient_id):
  */
 function db_add_message (mysqli $link, int $sender_id, int $recipient_id, string $message): bool
 {
-  $message = trim($message);
-  $sql =
-    "
-    INSERT INTO messages (sender_id, recipient_id, content) VALUES ($sender_id, $recipient_id, '$message');
-    ";
+  $message = mysqli_real_escape_string($link, trim($message));
+  $sql = "INSERT INTO messages (sender_id, recipient_id, content) VALUES ($sender_id, $recipient_id, '$message')";
 
   $result = mysqli_query($link, $sql);
 
