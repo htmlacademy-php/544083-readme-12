@@ -1,10 +1,9 @@
 <?php
 require_once('session.php');
-require_once('enums.php');
+require_once('init.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
 require_once('validator.php');
-require_once('init.php');
 
 $con = $con ?? null;
 
@@ -30,6 +29,7 @@ $layout_content = include_template('layout.php', [
   'title' => 'Результаты поиска',
   'content' => $page_content,
   'user' => $_SESSION['user'],
+  'unread_messages' => db_get_unread_message_count($con, $_SESSION['user']['id']),
 ]);
 
 print($layout_content);

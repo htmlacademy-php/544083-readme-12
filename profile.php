@@ -1,9 +1,8 @@
 <?php
 require_once('session.php');
-require_once('enums.php');
+require_once('init.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
-require_once('init.php');
 
 $con = $con ?? null;
 
@@ -17,7 +16,7 @@ include_not_found_page($user);
 
 $isFollowing = db_is_following($con, $user['id'], $_SESSION['user']['id']);
 
-$posts = db_get_posts($con, 'all', 'true', null, [$user_id]);
+$posts = db_get_posts($con, 'all', 'true', 'dt_add', [$user_id]);
 include_server_error_page(is_array($posts));
 
 $followings = [];
@@ -51,6 +50,7 @@ $layout_content = include_template('layout.php', [
   'title' => 'readme: профиль',
   'content' => $page_content,
   'user' => $_SESSION['user'],
+  'unread_messages' => db_get_unread_message_count($con, $_SESSION['user']['id']),
 ]);
 
 print($layout_content);

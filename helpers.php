@@ -379,3 +379,29 @@ function put_link_file(string $url, string $dir = 'img'): ?string
 
   return null;
 }
+
+/**
+ * @param string $date
+ *
+ * @return string
+ */
+function get_message_date (string $date): string
+{
+  if (!$date) {
+    return '';
+  }
+
+  $month = [1 => 'янв', 'фев', 'мар', 'апр', 'мая', 'июня', 'июля', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+  $date_format = 'Y-m-d H:i:s';
+  $current_date = date_create_from_format($date_format, date($date_format));
+  $date = date_create_from_format($date_format, $date);
+  $date_diff = date_diff($current_date, $date);
+
+  if ($date_diff->y > 0) {
+    return date_format($date, 'd') . ' ' . $month[date_format($date, 'n')] . ' ' . date_format($date, 'Y');
+  } else if ($date_diff->d > 0) {
+    return date_format($date, 'd') . ' ' .  $month[date_format($date, 'n')];
+  }
+
+  return date_format($date, 'H:i');
+}

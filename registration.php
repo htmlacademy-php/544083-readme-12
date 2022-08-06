@@ -1,10 +1,8 @@
 <?php
-
-require_once('enums.php');
+require_once('init.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
 require_once('validator.php');
-require_once('init.php');
 
 $con = $con ?? null;
 

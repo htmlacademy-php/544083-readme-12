@@ -49,7 +49,12 @@ $current_time = time();
           >
             <?= $isFollowing ? 'Отписаться' : 'Подписаться' ?>
           </a>
-          <a class="profile__user-button user__button user__button--writing button button--green" href="#">Сообщение</a>
+          <a
+            class="profile__user-button user__button user__button--writing button button--green"
+            href="/messages.php?id=<?= $user['id'] ?>"
+          >
+            Сообщение
+          </a>
         </div>
       </div>
     </div>

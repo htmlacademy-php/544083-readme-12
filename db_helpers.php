@@ -6,7 +6,7 @@
  * @param string $database
  * @return mysqli
  */
-function db_connect(string $host_name = 'localhost', string $username = 'root', string $password = '', string $database = 'readme'): mysqli
+function db_connect(string $host_name = HOST_NAME, string $username = DB_USERNAME, string $password = DB_PASSWORD, string $database = DB_NAME): mysqli
 {
   $con = mysqli_connect($host_name, $username, $password, $database);
   if ($con === false) {
@@ -147,7 +147,7 @@ function db_get_posts(
 
   $stmt_params = !$is_all_tab ? [$tab] : [];
 
-  if ($user_ids !== null) {
+  if ($user_ids) {
     $sql_filter_user = $is_all_tab ? "WHERE u.id IN (" : " AND (u.id IN (";
 
     $sql_filter_user .= implode(',', $user_ids);
@@ -416,6 +416,7 @@ function db_get_user(mysqli $link, int $id): ?array
     SELECT
       u.id,
       u.login,
+      u.email,
       u.dt_add,
       u.avatar,
       (SELECT COUNT(follower_id) FROM subscriptions WHERE following_id = ?) as followers_count,
@@ -748,7 +749,7 @@ function db_add_following (mysqli $link, int $following_id, int $follower_id): b
  * @param $follower_id int
  * @return bool
  */
-function db_delete_follower (mysqli $link, int $following_id, int $follower_id): bool
+function db_delete_following (mysqli $link, int $following_id, int $follower_id): bool
 {
   $sql = "DELETE FROM subscriptions WHERE following_id = $following_id AND follower_id = $follower_id";
 
@@ -762,7 +763,7 @@ function db_delete_follower (mysqli $link, int $following_id, int $follower_id):
 }
 
 /**
- * Возвращает список подписчиков и подписок
+ * Возвращает список подписок
  *
  * @param $link mysqli Ресурс соединения
  * @param $user_id int
@@ -787,4 +788,150 @@ function db_get_followings (mysqli $link, int $user_id): array
   $stmt = db_get_prepare_stmt($link, $sql, [$user_id]);
 
   return db_get_fetch_all($link, $stmt);
+}
+
+/**
+ * Возвращает список подписччико
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $user_id int
+ * @return array
+ */
+function db_get_followers (mysqli $link, int $user_id): array
+{
+  $sql =
+    "
+        SELECT
+         s.follower_id as id,
+         u.login,
+         u.email,
+         u.avatar,
+         u.dt_add,
+         (SELECT COUNT(sb.follower_id) FROM subscriptions sb WHERE sb.following_id = s.follower_id) as followers_count,
+         (SELECT COUNT(id) FROM posts WHERE author_id = s.follower_id) as posts_count
+        FROM subscriptions s
+        JOIN users u ON u.id = s.follower_id
+        WHERE following_id = ?
+    ";
+
+  $stmt = db_get_prepare_stmt($link, $sql, [$user_id]);
+
+  return db_get_fetch_all($link, $stmt);
+}
+
+/**
+ * Возвращает список диалогов
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $id int
+ * @return array
+ */
+function db_get_dialogs (mysqli $link, int $id): array
+{
+  $sql =
+    "
+      SELECT
+        u.id,
+        u.login,
+        u.avatar,
+        m.dt_add,
+        m.content,
+        (SELECT count(mr.is_read) FROM messages mr WHERE mr.is_read = 0 AND (mr.recipient_id = ? AND mr.sender_id = m.sender_id)) as unread_count
+      FROM messages m
+      JOIN users u ON (u.id IN (m.recipient_id, m.sender_id)) AND u.id != ?
+      WHERE (m.sender_id = ? OR m.recipient_id = ?)
+      AND m.dt_add IN 
+        (SELECT MAX(ms.dt_add) FROM messages ms JOIN users us ON (us.id IN (ms.recipient_id, ms.sender_id)) AND us.id != ? GROUP BY us.id)
+      ORDER BY m.dt_add DESC
+    ";
+
+  $stmt = db_get_prepare_stmt($link, $sql, [$id, $id, $id, $id, $id]);
+
+  return db_get_fetch_all($link, $stmt);
+}
+
+/**
+ * Возвращает диалог
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $dialog_user_id int
+ * @param $current_user_id int
+ * @return array
+ */
+function db_get_dialog (mysqli $link, int $dialog_user_id, int $current_user_id): array
+{
+  $sql =
+    "
+      SELECT
+        m.recipient_id,
+        m.sender_id,
+        m.content,
+        m.dt_add
+      FROM messages m
+      WHERE (m.sender_id = $dialog_user_id AND m.recipient_id = $current_user_id) OR (m.sender_id = $current_user_id AND m.recipient_id = $dialog_user_id)
+    ";
+
+  $stmt = db_get_prepare_stmt($link, $sql);
+
+  return db_get_fetch_all($link, $stmt);
+}
+
+/**
+ * Возвращает количество непрочитанных сообщений
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $recipient_id int
+ * @return int
+ */
+function db_get_unread_message_count (mysqli $link, int $recipient_id): int
+{
+  $sql = "SELECT COUNT(is_read) AS unread_count from messages WHERE is_read = 0 AND recipient_id = ?";
+
+  $stmt = db_get_prepare_stmt($link, $sql, [$recipient_id]);
+
+  return db_get_fetch_all($link, $stmt)[0]['unread_count'] ?? 0;
+}
+
+/**
+ * Устанавливает сообщения в статус прочитанно
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $recipient_id int
+ * @param $sender_id int
+ * @return bool
+ */
+function db_set_read_messages (mysqli $link, int $sender_id, int $recipient_id): bool
+{
+  $sql = "UPDATE messages SET is_read = 1 WHERE is_read = 0 AND (sender_id = $sender_id AND recipient_id = $recipient_id)";
+
+  $result = mysqli_query($link, $sql);
+
+  if (!$result && IS_DEBUGGING) {
+    die(mysqli_error($link));
+  }
+
+  return $result;
+}
+
+/**
+ * Добавляет сообщение
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $sender_id int
+ * @param $recipient_id int
+ * @param $message string
+ * @return boolean
+ */
+function db_add_message (mysqli $link, int $sender_id, int $recipient_id, string $message): bool
+{
+  $message = mysqli_real_escape_string($link, trim($message));
+  $sql = "INSERT INTO messages (sender_id, recipient_id, content) VALUES ($sender_id, $recipient_id, '$message')";
+
+  $result = mysqli_query($link, $sql);
+
+  if (!$result && IS_DEBUGGING) {
+    die(mysqli_error($link));
+  }
+
+  return $result;
 }

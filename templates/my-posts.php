@@ -12,7 +12,7 @@ $tab = $tab ?? '';
   </div>
   <div class="page__main-wrapper container">
     <?php if(count($posts) === 0): ?>
-      Вы не опубликовали ни одного поста
+      Постов нет
     <?php else: ?>
       <section class="feed">
         <h2 class="visually-hidden">Лента</h2>

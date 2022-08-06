@@ -93,6 +93,7 @@ CREATE TABLE messages (
     content TEXT NOT NULL,
     sender_id INT NOT NULL,
     recipient_id INT NOT NULL,
+    is_read TINYINT(1) DEFAULT 0,
     CONSTRAINT msg_sender_ref FOREIGN KEY (sender_id) REFERENCES users (id),
     CONSTRAINT msg_recipient_ref FOREIGN KEY (recipient_id) REFERENCES users (id)  ON DELETE CASCADE
 );
