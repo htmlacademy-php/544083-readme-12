@@ -19,6 +19,13 @@ function validate_text_field (string $field, string $label = '', bool $is_requir
     ];
   }
 
+  if (isset($field) && trim($field) === '') {
+    return [
+      'label' => $label,
+      'error' => 'Это поле не должно быть пустой строкой'
+    ];
+  }
+
   $len = strlen($field);
 
   if (($min > 0 || $max > 0) && strlen($field) > 0) {

@@ -4,9 +4,10 @@ if (!empty($_SESSION['user'])) {
   header("location: popular.php");
 }
 
-require_once('init.php');
+require_once ('config.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
+require_once('init.php');
 require_once('validator.php');
 
 $errors = [];
@@ -21,11 +22,11 @@ if (count($_POST) > 0) {
 
     if ($user === null) {
       $errors['login'] = [
-        'error' => 'Неверный логин'
+        'error' => 'Неверный логин или пароль'
       ];
     } elseif (!password_verify($_POST['password'], $user['password'])) {
       $errors['password'] = [
-        'error' => 'Пароли не совпадают'
+        'error' => 'Неверный логин или пароль'
       ];
     } else {
       $_SESSION['user'] = [

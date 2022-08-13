@@ -2,8 +2,9 @@
 $post = $post ?? [];
 $user = $user ?? [];
 $current_user = $current_user ?? [];
-$isFollowing = $isFollowing ?? null;
+$is_following = $is_following ?? null;
 $current_time = time();
+$comment_error = $comment_error ?? null;
 ?>
 
 <main class="page__main page__main--publication">
@@ -120,11 +121,20 @@ $current_time = time();
               <div class="comments__my-avatar">
                 <img class="comments__picture" src="img/<?= $current_user['avatar'] ?>" alt="Аватар пользователя">
               </div>
-              <input type="hidden" name="post-id" value="<?= $post['id'] ?? '' ?>">
-              <input type="hidden" name="user-id" value="<?= $current_user['id'] ?>">
-              <input type="hidden" name="author-id" value="<?= $post['author_id'] ?>">
-              <textarea name="comment-content" class="comments__textarea form__textarea" placeholder="Ваш комментарий"></textarea>
-              <label class="visually-hidden">Ваш комментарий</label>
+              <div class="form__input-section <?= add_class((bool)$comment_error, 'form__input-section--error') ?>">
+                <input type="hidden" name="post-id" value="<?= $post['id'] ?? '' ?>">
+                <input type="hidden" name="user-id" value="<?= $current_user['id'] ?>">
+                <input type="hidden" name="author-id" value="<?= $post['author_id'] ?>">
+                <textarea name="comment-content" class="comments__textarea form__textarea form__input" placeholder="Ваш комментарий"></textarea>
+                <label class="visually-hidden">Ваш комментарий</label>
+                <?php if ($comment_error): ?>
+                  <button class="form__error-button button" type="button">!</button>
+                  <div class="form__error-text">
+                    <h3 class="form__error-title">Ошибка валидации</h3>
+                    <p class="form__error-desc"><?= $comment_error ?></p>
+                  </div>
+                <?php endif; ?>
+              </div>
               <button class="comments__submit button button--green" type="submit">Отправить</button>
             </form>
             <?php if(count($post['comments']) > 0): ?>
@@ -214,7 +224,7 @@ $current_time = time();
               href="/subscription.php?id=<?= $user['id'] ?>"
               class="user__button user__button--subscription button button--main"
             >
-              <?= $isFollowing ? 'Отписаться' : 'Подписаться' ?>
+              <?= $is_following ? 'Отписаться' : 'Подписаться' ?>
             </a>
             <a class="user__button user__button--writing button button--green" href="#">Сообщение</a>
           </div>

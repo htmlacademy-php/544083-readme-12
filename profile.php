@@ -1,12 +1,13 @@
 <?php
 require_once('session.php');
-require_once('init.php');
+require_once ('config.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
+require_once('init.php');
 
 $con = $con ?? null;
-
 $user_id = $_GET['id'] ?? null;
+$user_id = (int) $user_id;
 include_not_found_page($user_id && (int)($user_id));
 
 $tab = $_GET['tab'] ?? null;
@@ -44,6 +45,7 @@ $page_content = include_template('profile-content.php', [
   'followings' => $followings,
   'isFollowing' => $isFollowing,
   'tab' => $tab,
+  'comment_error' => $_GET['comment-error'] ?? null,
 ]);
 
 $layout_content = include_template('layout.php', [

@@ -1,8 +1,9 @@
 <?php
 require_once('session.php');
-require_once('init.php');
+require_once ('config.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
+require_once('init.php');
 require_once('validator.php');
 
 $con = $con ?? null;
@@ -48,7 +49,15 @@ if ($current_dialog_user_id) {
   }
 
   if (isset($_POST['message-content'])) {
-    $error = validate_text_field($_POST['message-content'], 'Ошибка валидации', true);
+    $label = 'Ошибка валидации';
+    $error = validate_text_field($_POST['message-content'], $label, true);
+
+    if (!$error && $_SESSION['user']['id'] === $current_dialog_user_id) {
+      $error = [
+        'label' => $label,
+        'error' => 'Вы не можете отправить сообщение самому себе'
+      ];
+    }
 
     if (!$error) {
       $add_message = db_add_message($con, $_SESSION['user']['id'], $current_dialog_user_id, $_POST['message-content']);
