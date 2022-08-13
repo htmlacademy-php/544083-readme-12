@@ -6,6 +6,7 @@ $followings = $followings ?? [];
 $isFollowing = $isFollowing ?? null;
 $tab = $tab ?? null;
 $current_time = time();
+$comment_error = $comment_error ?? null;
 ?>
 
 <main class="page__main page__main--profile">
@@ -110,6 +111,7 @@ $current_time = time();
                 $comments= $post['comments'] ?? [];
                 $dt_add = $post['dt_add'] ?? '';
                 $hash_tags = $post['hash_tags'] ?? [];
+                $is_comment_add_error = $comment_error && (int) $comment_error['id'] === $id && (bool)$comment_error['error'];
                 ?>
                 <article class="profile__post post post-<?= $type ?>">
                   <header class="post__header">
@@ -225,13 +227,13 @@ $current_time = time();
                       <div class="comments__list-wrapper">
                         <ul class="comments__list">
                           <?php foreach($comments as $comment): ?>
-                          <?php
-                            $author_id = $comment['author_id'] ?? '';
-                            $author_name = $comment['author_name'] ?? '';
-                            $avatar = $comment['avatar'] ?? '';
-                            $dt_add = $comment['dt_add'] ?? '';
-                            $content = htmlspecialchars($comment['content'] ?? '');
-                          ?>
+                            <?php
+                              $author_id = $comment['author_id'] ?? '';
+                              $author_name = $comment['author_name'] ?? '';
+                              $avatar = $comment['avatar'] ?? '';
+                              $dt_add = $comment['dt_add'] ?? '';
+                              $content = htmlspecialchars($comment['content'] ?? '');
+                            ?>
                             <li class="comments__item user">
                               <div class="comments__avatar">
                                 <a class="user__avatar-link" href="/profile.php?id=<?= $author_id ?>">
@@ -265,11 +267,20 @@ $current_time = time();
                     <div class="comments__my-avatar">
                       <img class="comments__picture" src="img/<?= $current_user['avatar'] ?>" alt="Аватар пользователя">
                     </div>
-                    <input type="hidden" name="post-id" value="<?= $id ?>">
-                    <input type="hidden" name="user-id" value="<?= $current_user['id'] ?>">
-                    <input type="hidden" name="author-id" value="<?= $author_id ?>">
-                    <textarea name="comment-content" class="comments__textarea form__textarea" placeholder="Ваш комментарий"></textarea>
-                    <label class="visually-hidden">Ваш комментарий</label>
+                    <div class="form__input-section<?= add_class($is_comment_add_error, 'form__input-section--error') ?>">
+                      <input type="hidden" name="post-id" value="<?= $id ?>">
+                      <input type="hidden" name="user-id" value="<?= $current_user['id'] ?>">
+                      <input type="hidden" name="author-id" value="<?= $author_id ?>">
+                      <textarea name="comment-content" class="comments__textarea form__textarea form__input" placeholder="Ваш комментарий"></textarea>
+                      <label class="visually-hidden">Ваш комментарий</label>
+                      <?php if ($is_comment_add_error): ?>
+                        <button class="form__error-button button" type="button">!</button>
+                        <div class="form__error-text">
+                          <h3 class="form__error-title">Ошибка валидации</h3>
+                          <p class="form__error-desc"><?= $comment_error['error'] ?></p>
+                        </div>
+                      <?php endif; ?>
+                    </div>
                     <button class="comments__submit button button--green" type="submit">Отправить</button>
                   </form>
                 </article>

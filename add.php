@@ -1,8 +1,9 @@
 <?php
 require_once('session.php');
-require_once('init.php');
+require_once ('config.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
+require_once('init.php');
 require_once('validator.php');
 require_once ('send-mail.php');
 
@@ -20,7 +21,7 @@ $values = [];
 
 if (count($_POST) > 0) {
   $errors = get_errors_post_form($_POST, $_FILES);
-  if (isset($_POST['type']) && $_POST['type'] === 'photo') {
+  if (!$errors && isset($_POST['type']) && $_POST['type'] === 'photo') {
     $move_file = move_download_file($_FILES['post-photo'] ?? []);
     if ($move_file === '') {
       $errors['post-photo'] = [

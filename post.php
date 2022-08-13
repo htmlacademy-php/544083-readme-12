@@ -1,12 +1,14 @@
 <?php
 require_once('session.php');
-require_once('init.php');
+require_once ('config.php');
 require_once('helpers.php');
 require_once('db_helpers.php');
+require_once('init.php');
 
 $con = $con ?? null;
 
 $id = $_GET['id'] ?? '';
+$id = (int) $id;
 include_not_found_page($id);
 
 mysqli_begin_transaction($con);
@@ -24,13 +26,14 @@ $post_author_id =  $post['author_id'] ?? '';
 $user = db_get_user($con, $post_author_id);
 include_server_error_page($user);
 
-$isFollowing = db_is_following($con, $user['id'], $_SESSION['user']['id']);
+$is_following = db_is_following($con, $user['id'], $_SESSION['user']['id']);
 
 $page_content = include_template('post-details.php', [
   'post' => $post,
   'user' => $user,
   'current_user' => $_SESSION['user'],
-  'isFollowing' => $isFollowing,
+  'is_following' => $is_following,
+  'comment_error' => $_GET['comment-error']['error'] ?? null,
 ]);
 
 $layout_content = include_template('layout.php', [
