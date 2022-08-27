@@ -11,7 +11,7 @@ $con = $con ?? null;
 $post_types = db_get_post_types($con);
 include_server_error_page($post_types);
 
-$tab = $_GET['tab'] ?? $_POST['type'] ?? 'photo';
+$tab = $_GET['tab'] ?? $_POST['type'] ?? 'quote';
 
 $types = array_column($post_types, 'type', 'id');
 include_not_found_page(in_array($tab, $types, true));
