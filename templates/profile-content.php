@@ -19,9 +19,9 @@ $comment_error = $comment_error ?? null;
             <img class="profile__picture user__picture" src="img/<?= $user['avatar'] ?? '' ?>" alt="Аватар пользователя">
           </div>
           <div class="profile__name-wrapper user__name-wrapper">
-            <span class="profile__name user__name"><?= $user['login'] ?></span>
-            <time class="profile__user-time user__time" datetime="<?= $user['dt_add'] ?>">
-              <?= relative_time(time() - strtotime($user['dt_add'])) ?> на сайте
+            <span class="profile__name user__name"><?= $user['login'] ?? '' ?></span>
+            <time class="profile__user-time user__time" datetime="<?= $user['dt_add'] ?? '' ?>">
+              <?= relative_time(time() - strtotime($user['dt_add'] ?? 0)) ?> на сайте
             </time>
           </div>
         </div>
@@ -43,20 +43,22 @@ $comment_error = $comment_error ?? null;
             </span>
           </p>
         </div>
-        <div class="profile__user-buttons user__buttons">
-          <a
-            href="/subscription.php?id=<?= $user['id'] ?>"
-            class="profile__user-button user__button user__button--subscription button button--main"
-          >
-            <?= $isFollowing ? 'Отписаться' : 'Подписаться' ?>
-          </a>
-          <a
-            class="profile__user-button user__button user__button--writing button button--green"
-            href="/messages.php?id=<?= $user['id'] ?>"
-          >
-            Сообщение
-          </a>
-        </div>
+        <?php if (isset($current_user['id']) && isset($user['id']) && $current_user['id'] !== $user['id']): ?>
+          <div class="profile__user-buttons user__buttons">
+            <a
+              href="/subscription.php?id=<?= $user['id'] ?? '' ?>"
+              class="profile__user-button user__button user__button--subscription button button--main"
+            >
+              <?= $isFollowing ? 'Отписаться' : 'Подписаться' ?>
+            </a>
+            <a
+              class="profile__user-button user__button user__button--writing button button--green"
+              href="/messages.php?id=<?= $user['id'] ?? '' ?>"
+            >
+              Сообщение
+            </a>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
     <div class="profile__tabs-wrapper tabs">
@@ -415,14 +417,16 @@ $comment_error = $comment_error ?? null;
                         </span>
                       </p>
                     </div>
-                    <div class="post-mini__user-buttons user__buttons">
-                      <a
-                        class="post-mini__user-button user__button user__button--subscription button button--<?= $following['isCurrentUserFollowing'] ? 'quartz' : 'main' ?>"
-                        href="/subscription.php?id=<?= $following['id'] ?>"
-                      >
-                        <?= $following['isCurrentUserFollowing'] ? 'Отписаться' : 'Подписаться' ?>
-                      </a>
-                    </div>
+                    <?php if (isset($current_user['id']) && isset($following['id']) && $current_user['id'] !== $following['id']): ?>
+                      <div class="post-mini__user-buttons user__buttons">
+                        <a
+                          class="post-mini__user-button user__button user__button--subscription button button--<?= $following['isCurrentUserFollowing'] ? 'quartz' : 'main' ?>"
+                          href="/subscription.php?id=<?= $following['id'] ?? '' ?>"
+                        >
+                          <?= $following['isCurrentUserFollowing'] ? 'Отписаться' : 'Подписаться' ?>
+                        </a>
+                      </div>
+                    <?php endif; ?>
                   </li>
                 <?php endforeach; ?>
               </ul>

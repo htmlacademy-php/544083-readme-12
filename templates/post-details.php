@@ -219,15 +219,17 @@ $comment_error = $comment_error ?? null;
               </span>
             </p>
           </div>
-          <div class="post-details__user-buttons user__buttons">
-            <a
-              href="/subscription.php?id=<?= $user['id'] ?>"
-              class="user__button user__button--subscription button button--main"
-            >
-              <?= $is_following ? 'Отписаться' : 'Подписаться' ?>
-            </a>
-            <a class="user__button user__button--writing button button--green" href="#">Сообщение</a>
-          </div>
+          <?php if (isset($current_user['id']) && isset($user['id']) && $current_user['id'] !== $user['id']): ?>
+            <div class="post-details__user-buttons user__buttons">
+              <a
+                href="/subscription.php?id=<?= $user['id'] ?>"
+                class="user__button user__button--subscription button button--main"
+              >
+                <?= $is_following ? 'Отписаться' : 'Подписаться' ?>
+              </a>
+              <a class="user__button user__button--writing button button--green" href="#">Сообщение</a>
+            </div>
+          <?php endif; ?>
         </div>
       </div>
     </section>
