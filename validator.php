@@ -204,7 +204,7 @@ function validate_email_field (string $field, string $label): ?array
   if (empty($field)) {
     return [
       'label' => $label,
-      'error' => 'Поле долно быть заполненно'
+      'error' => 'Поле должно быть заполненно'
     ];
   }
 
@@ -235,7 +235,7 @@ function validate_repeat_password (string $main_field, string $field, string $la
   if (empty($field)) {
     return [
       'label' => $label,
-      'error' => 'Поле долно быть заполненно'
+      'error' => 'Поле должно быть заполненно'
     ];
   }
 
@@ -243,6 +243,32 @@ function validate_repeat_password (string $main_field, string $field, string $la
     return [
       'label' => $label,
       'error' => 'Пароли не совпадают'
+    ];
+  }
+
+  return null;
+}
+
+/**
+ * Валидирует поле с cсылкой
+ *
+ * @param string $field
+ * @param string $label
+ * @return ?array
+ */
+function validate_link_field (string $field, string $label): ?array
+{
+  if (empty($field)) {
+    return [
+      'label' => $label,
+      'error' => 'Поле должно быть заполненно'
+    ];
+  }
+
+  if (!filter_var($field, FILTER_VALIDATE_URL)) {
+    return [
+      'error' => 'Значение не является ссылкой',
+      'label' => $label,
     ];
   }
 
@@ -267,6 +293,7 @@ function get_errors_post_form (array $post, array $files): array
     'quote-author' => fn() => validate_text_field($post['quote-author'], 'Автор', true, 0, 50),
     'hash-tags' => fn() => validate_hash_tags($post['hash-tags'], 'Теги'),
     'video-url' => fn() => validate_video_link($post['video-url'], 'Ссылка YOUTUBE'),
+    'post-link' => fn() => validate_link_field($post['post-link'], 'Ссылка'),
   ];
 
   foreach ($post as $key => $field) {
