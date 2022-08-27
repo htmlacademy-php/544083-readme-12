@@ -183,12 +183,11 @@ function db_get_posts(
       p.author_id,
       pt.type,
       u.login AS author,
-      u.avatar
+      u.avatar,
+    (SELECT COUNT(post_id) FROM likes WHERE post_id = p.id) as likes_count
     FROM posts p
     JOIN users u ON p.author_id = u.id
     JOIN post_types pt ON pt.id = p.type_id
-    LEFT JOIN likes l ON l.post_id = p.id
-    LEFT JOIN comments c ON c.post_id = p.id
     $sql_filter
     GROUP BY p.id
     $sort
