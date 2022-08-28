@@ -136,7 +136,7 @@ function db_get_post_types(mysqli $link): ?array
  */
 function db_get_posts(
   mysqli $link,
-  int|string $tab,
+  string $tab,
   bool $is_all_tab,
   string $sort = null,
   array $user_ids = null,
