@@ -21,7 +21,7 @@ $values = $values ?? [];
                 type="email"
                 name="email"
                 placeholder="Укажите эл.почту"
-                value="<?= $values['email'] ?? '' ?>"
+                value="<?= htmlspecialchars($values['email'] ?? '') ?>"
               >
               <?php print(include_template('components/form/form-error.php', [
                 'error' => $errors['email'] ?? '',
@@ -37,7 +37,7 @@ $values = $values ?? [];
                 type="text"
                 name="login"
                 placeholder="Укажите логин"
-                value="<?= $values['login'] ?? '' ?>"
+                value="<?= htmlspecialchars($values['login'] ?? '') ?>"
               >
               <?php print(include_template('components/form/form-error.php', [
                 'error' => $errors['login'] ?? '',

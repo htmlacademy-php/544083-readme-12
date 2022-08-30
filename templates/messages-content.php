@@ -24,7 +24,7 @@ $error = $error ?? [];
                 href="/messages.php?id=<?= $dialog['id'] ?? '' ?>"
               >
                 <div class="messages__avatar-wrapper">
-                  <img class="messages__avatar" src="img/<?= $dialog['avatar'] ?? '' ?>" alt="Аватар пользователя">
+                  <img class="messages__avatar" src="img/<?= htmlspecialchars($dialog['avatar'] ?? '') ?>" alt="Аватар пользователя">
                   <?php if(!$is_active && boolval($dialog['unread_count'])): ?>
                     <i class="messages__indicator">
                       <?= $dialog['unread_count'] ?>
@@ -33,7 +33,7 @@ $error = $error ?? [];
                 </div>
                 <div class="messages__info">
                     <span class="messages__contact-name">
-                      <?= $dialog['login'] ?? '' ?>
+                      <?= htmlspecialchars($dialog['login'] ?? '') ?>
                     </span>
                   <div class="messages__preview">
                     <p class="messages__preview-text">
@@ -63,20 +63,20 @@ $error = $error ?? [];
                   <div class="messages__info-wrapper">
                     <div class="messages__item-avatar">
                       <a class="messages__author-link" href="/profile.php?id=<?= $user['id'] ?>">
-                        <img class="messages__avatar" src="img/<?= $user['avatar'] ?>" alt="Аватар пользователя">
+                        <img class="messages__avatar" src="img/<?= htmlspecialchars($user['avatar']) ?>" alt="Аватар пользователя">
                       </a>
                     </div>
                     <div class="messages__item-info">
-                      <a class="messages__author" href="/profile.php?id=<?= $user['id'] ?>">
-                        <?= $user['login'] ?>
+                      <a class="messages__author" href="/profile.php?id=<?= $user['id'] ?? '' ?>">
+                        <?= htmlspecialchars($user['login'] ?? '') ?>
                       </a>
-                      <time class="messages__time" datetime="<?= $item['dt_add'] ?>">
+                      <time class="messages__time" datetime="<?= $item['dt_add'] ?? '' ?>">
                         <?= get_message_date($item['dt_add'] ?? '') ?>
                       </time>
                     </div>
                   </div>
                   <p class="messages__text">
-                    <?= $item['content'] ?>
+                    <?= htmlspecialchars($item['content'] ?? '') ?>
                   </p>
                 </li>
               <?php endforeach; ?>
@@ -86,9 +86,9 @@ $error = $error ?? [];
           <?php endif; ?>
         </div>
         <div class="comments">
-          <form class="comments__form form" action="/messages.php?id=<?= $current_dialog_user['id'] ?>" method="post">
+          <form class="comments__form form" action="/messages.php?id=<?= $current_dialog_user['id'] ?? '' ?>" method="post">
             <div class="comments__my-avatar">
-              <img class="comments__picture" src="img/<?= $current_user['avatar'] ?>" alt="Аватар пользователя">
+              <img class="comments__picture" src="img/<?= htmlspecialchars($current_user['avatar'] ?? '') ?>" alt="Аватар пользователя">
             </div>
             <div class="form__input-section<?= add_class(count($error) > 0, 'form__input-section--error') ?>">
               <textarea class="comments__textarea form__textarea form__input" name="message-content" placeholder="Ваше сообщение"></textarea>

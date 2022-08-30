@@ -21,7 +21,7 @@ $values = $values ?? [];
               id="post-link"
               type="text"
               name="post-link"
-              value="<?= $values['post-link'] ?? '' ?>"
+              value="<?= htmlspecialchars($values['post-link'] ?? '') ?>"
               placeholder="Введите ссылку"
             >
             <?php print(include_template('components/form/form-error.php', [

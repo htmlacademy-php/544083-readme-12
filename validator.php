@@ -312,7 +312,7 @@ function get_errors_post_form (array $post, array $files): array
 
   foreach ($post as $key => $field) {
     if (isset($rules[$key])) {
-      $errors[$key] = $rules[$key]();
+      $errors[$key] = $rules[$key]($field);
     }
   }
 
@@ -365,7 +365,7 @@ function get_errors_join_form (array $post, array $file): array
 
   foreach ($post as $key => $field) {
     if (isset($rules[$key])) {
-      $errors[$key] = $rules[$key]();
+      $errors[$key] = $rules[$key]($field);
     }
   }
 
@@ -395,7 +395,7 @@ function get_errors_login_form (array $post): array
 
   foreach ($post as $key => $field) {
     if (isset($rules[$key])) {
-      $errors[$key] = $rules[$key]();
+      $errors[$key] = $rules[$key]($field);
     }
   }
 

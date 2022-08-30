@@ -10,7 +10,7 @@ $comment_error = $comment_error ?? null;
 <main class="page__main page__main--publication">
   <div class="container">
     <h1 class="page__title page__title--publication">
-      <?= $post['title'] ?? ''?>
+      <?= htmlspecialchars($post['title'] ?? '') ?>
     </h1>
     <section class="post-details">
       <h2 class="visually-hidden">Публикация</h2>
@@ -22,10 +22,10 @@ $comment_error = $comment_error ?? null;
                 <div class="post__main">
                   <blockquote>
                     <p>
-                      <?= $post['text'] ?? '' ?>
+                      <?= htmlspecialchars($post['text'] ?? '') ?>
                     </p>
                     <cite>
-                      <?= $post['quote_author'] ?? '' ?>
+                      <?= htmlspecialchars($post['quote_author'] ?? '') ?>
                     </cite>
                   </blockquote>
                 </div>
@@ -34,20 +34,20 @@ $comment_error = $comment_error ?? null;
               <div class="post-details__image-wrapper post-text">
                 <div class="post__main">
                   <p>
-                    <?= $post['text'] ?? '' ?>
+                    <?= htmlspecialchars($post['text'] ?? '') ?>
                   </p>
                 </div>
               </div>
             <?php elseif ($post['type'] === 'link'): ?>
               <div class="post__main">
                 <div class="post-link__wrapper">
-                  <a class="post-link__external" href="http://<?= $post['link'] ?>" title="Перейти по ссылке">
+                  <a class="post-link__external" href="http://<?= htmlspecialchars($post['link'] ?? '') ?>" title="Перейти по ссылке">
                     <div class="post-link__info-wrapper">
                       <div class="post-link__icon-wrapper">
-                        <img src="https://www.google.com/s2/favicons?domain=<?= $post['link'] ?>" alt="Иконка">
+                        <img src="https://www.google.com/s2/favicons?domain=<?= htmlspecialchars($post['link'] ?? '') ?>" alt="Иконка">
                       </div>
                       <div class="post-link__info">
-                        <h3><?= $post['title'] ?? '' ?></h3>
+                        <h3><?= htmlspecialchars($post['title'] ?? '') ?></h3>
                       </div>
                     </div>
                   </a>
@@ -59,7 +59,7 @@ $comment_error = $comment_error ?? null;
               </div>
             <?php elseif ($post['type'] === 'photo'): ?>
               <div class="post-details__image-wrapper post-photo__image-wrapper">
-                <img src="img/<?= $post['image'] ?? '' ?>" alt="Фото от пользователя" width="760" height="507">
+                <img src="img/<?= htmlspecialchars($post['image'] ?? '') ?>" alt="Фото от пользователя" width="760" height="507">
               </div>
             <?php endif; ?>
           <?php endif; ?>
@@ -108,9 +108,10 @@ $comment_error = $comment_error ?? null;
           <?php if (isset($post['hash_tags'])): ?>
             <ul class="post__tags">
               <?php foreach($post['hash_tags'] as $tag): ?>
+              <?php $tag = htmlspecialchars($tag) ?>
                 <li>
                   <a href="<?= '/search.php?search=' . urlencode("#$tag")  ?>">
-                    <?= "#$tag" ?>
+                    <?= "#{$tag}" ?>
                   </a>
                 </li>
               <?php endforeach; ?>
@@ -119,12 +120,12 @@ $comment_error = $comment_error ?? null;
           <div class="comments">
             <form class="comments__form form" action="/comment-add.php" method="post">
               <div class="comments__my-avatar">
-                <img class="comments__picture" src="img/<?= $current_user['avatar'] ?>" alt="Аватар пользователя">
+                <img class="comments__picture" src="img/<?= htmlspecialchars($current_user['avatar'] ?? '') ?>" alt="Аватар пользователя">
               </div>
               <div class="form__input-section <?= add_class((bool)$comment_error, 'form__input-section--error') ?>">
                 <input type="hidden" name="post-id" value="<?= $post['id'] ?? '' ?>">
-                <input type="hidden" name="user-id" value="<?= $current_user['id'] ?>">
-                <input type="hidden" name="author-id" value="<?= $post['author_id'] ?>">
+                <input type="hidden" name="user-id" value="<?= $current_user['id'] ?? '' ?>">
+                <input type="hidden" name="author-id" value="<?= $post['author_id'] ?? '' ?>">
                 <textarea name="comment-content" class="comments__textarea form__textarea form__input" placeholder="Ваш комментарий"></textarea>
                 <label class="visually-hidden">Ваш комментарий</label>
                 <?php if ($comment_error): ?>
@@ -143,8 +144,8 @@ $comment_error = $comment_error ?? null;
                   <?php foreach($post['comments'] as $comment): ?>
                     <?php
                     $author_id = $comment['author_id'] ?? '';
-                    $author_name = $comment['author_name'] ?? '';
-                    $avatar = $comment['avatar'] ?? '';
+                    $author_name = htmlspecialchars($comment['author_name'] ?? '');
+                    $avatar = htmlspecialchars($comment['avatar'] ?? '');
                     $dt_add = $comment['dt_add'] ?? '';
                     $content = htmlspecialchars($comment['content'] ?? '');
                     ?>
@@ -182,13 +183,13 @@ $comment_error = $comment_error ?? null;
           <div class="post-details__user-info user__info">
             <div class="post-details__avatar user__avatar">
               <a class="post-details__avatar-link user__avatar-link" href="#">
-                <img class="post-details__picture user__picture" src="img/<?= $user['avatar'] ?? '' ?>" alt="Аватар пользователя">
+                <img class="post-details__picture user__picture" src="img/<?= htmlspecialchars($user['avatar'] ?? '') ?>" alt="Аватар пользователя">
               </a>
             </div>
             <div class="post-details__name-wrapper user__name-wrapper">
               <a class="post-details__name user__name" href="#">
                 <span>
-                  <?= $user['login'] ?? '' ?>
+                  <?= htmlspecialchars($user['login'] ?? '') ?>
                 </span>
               </a>
               <time

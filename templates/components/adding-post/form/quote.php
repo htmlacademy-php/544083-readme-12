@@ -21,7 +21,7 @@ $values = $values ?? [];
               id="cite-text"
               name="cite-text"
               placeholder="Текст цитаты"
-            ><?= $values['cite-text'] ?? '' ?></textarea>
+            ><?= htmlspecialchars($values['cite-text'] ?? '') ?></textarea>
             <?php print(include_template('components/form/form-error.php', [
               'error' => $errors['cite-text'] ?? '',
             ])); ?>
@@ -36,7 +36,7 @@ $values = $values ?? [];
               type="text"
               name="quote-author"
               placeholder="Автор цитаты"
-              value="<?= $values['quote-author'] ?? '' ?>"
+              value="<?= htmlspecialchars($values['quote-author'] ?? '') ?>"
             >
             <?php print(include_template('components/form/form-error.php', [
               'error' => $errors['quote-author'] ?? '',

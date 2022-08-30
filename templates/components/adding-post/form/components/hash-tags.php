@@ -12,7 +12,7 @@ $value = $value ?? '';
       type="text"
       name="hash-tags"
       placeholder="Введите теги"
-      value="<?= $value ?>"
+      value="<?= htmlspecialchars($value) ?>"
     >
     <?php print(include_template('components/form/form-error.php', [
       'error' => $error,

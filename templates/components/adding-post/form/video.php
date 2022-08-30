@@ -22,7 +22,7 @@ $values = $values ?? [];
               type="text"
               name="video-url"
               placeholder="Введите ссылку"
-              value="<?= $values['video-url'] ?? '' ?>"
+              value="<?= htmlspecialchars($values['video-url'] ?? '') ?>"
             >
             <?php print(include_template('components/form/form-error.php', [
               'error' => $errors['video-url'] ?? '',

@@ -11,7 +11,7 @@
       <div class="search__query container">
         <span>Вы искали:</span>
         <span class="search__query-text">
-          <?= $query ?>
+          <?= htmlspecialchars($query) ?>
         </span>
       </div>
     </div>

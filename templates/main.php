@@ -71,7 +71,7 @@
               type="text"
               name="login"
               placeholder="Логин"
-              value="<?= $login_value ?? '' ?>"
+              value="<?= htmlspecialchars($login_value ?? '') ?>"
             >
             <svg class="form__input-icon" width="19" height="18">
               <use xlink:href="#icon-input-user"></use>

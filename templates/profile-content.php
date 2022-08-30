@@ -16,10 +16,14 @@ $comment_error = $comment_error ?? null;
       <div class="profile__user user container">
         <div class="profile__user-info user__info">
           <div class="profile__avatar user__avatar">
-            <img class="profile__picture user__picture" src="img/<?= $user['avatar'] ?? '' ?>" alt="Аватар пользователя">
+            <img
+              class="profile__picture user__picture"
+              src="img/<?= htmlspecialchars($user['avatar'] ?? '') ?>"
+              alt="Аватар пользователя"
+            >
           </div>
           <div class="profile__name-wrapper user__name-wrapper">
-            <span class="profile__name user__name"><?= $user['login'] ?? '' ?></span>
+            <span class="profile__name user__name"><?= htmlspecialchars($user['login'] ?? '') ?></span>
             <time class="profile__user-time user__time" datetime="<?= $user['dt_add'] ?? '' ?>">
               <?= relative_time(time() - strtotime($user['dt_add'] ?? 0)) ?> на сайте
             </time>
@@ -85,7 +89,7 @@ $comment_error = $comment_error ?? null;
             <li class="profile__tabs-item filters__item">
               <a
                 class="profile__tabs-link filters__button tabs__item button<?= add_class($tab === 'subscriptions', 'filters__button--active') ?>"
-                href="/profile.php?id=<?= $user['id'] ?>&tab=<?= 'subscriptions' ?>"
+                href="/profile.php?id=<?= $user['id'] ?>&tab=subscriptions"
               >
                 Подписки
               </a>
@@ -106,7 +110,7 @@ $comment_error = $comment_error ?? null;
                 $link = htmlspecialchars($post['link'] ?? '');
                 $image = htmlspecialchars($post['image'] ?? '');
                 $avatar = htmlspecialchars($post['avatar'] ?? '');
-                $author = $post['author'] ?? '';
+                $author = htmlspecialchars($post['author'] ?? '');
                 $author_id = $post['author_id'] ?? '';
                 $id = $post['id'] ?? '';
                 $likes = $post['likes'] ?? [];
@@ -166,11 +170,11 @@ $comment_error = $comment_error ?? null;
                       <div class="post-link__wrapper">
                         <a class="post-link__external" href="<?= $link ?>" title="Перейти по ссылке">
                           <div class="post-link__icon-wrapper">
-                            <img src="https://www.google.com/s2/favicons?domain=<?= $post['link'] ?>" alt="Иконка">
+                            <img src="https://www.google.com/s2/favicons?domain=<?= $link ?>" alt="Иконка">
                           </div>
                           <div class="post-link__info">
                             <h3><?= $title ?></h3>
-                            <span><?= $post['link'] ?></span>
+                            <span><?= $link ?></span>
                           </div>
                           <svg class="post-link__arrow" width="11" height="16">
                             <use xlink:href="#icon-arrow-right-ad"></use>
@@ -215,6 +219,7 @@ $comment_error = $comment_error ?? null;
                     <?php if (count($hash_tags) > 0): ?>
                       <ul class="post__tags">
                         <?php foreach ($hash_tags as $tag): ?>
+                        <?php $tag = htmlspecialchars($tag) ?>
                           <li>
                             <a href="<?= '/search.php?search=' . urlencode("#$tag")  ?>">
                               <?= "#$tag" ?>
@@ -231,8 +236,8 @@ $comment_error = $comment_error ?? null;
                           <?php foreach($comments as $comment): ?>
                             <?php
                               $author_id = $comment['author_id'] ?? '';
-                              $author_name = $comment['author_name'] ?? '';
-                              $avatar = $comment['avatar'] ?? '';
+                              $author_name = htmlspecialchars($comment['author_name'] ?? '');
+                              $avatar = htmlspecialchars($comment['avatar'] ?? '');
                               $dt_add = $comment['dt_add'] ?? '';
                               $content = htmlspecialchars($comment['content'] ?? '');
                             ?>
@@ -267,7 +272,7 @@ $comment_error = $comment_error ?? null;
                   <?php endif; ?>
                   <form class="comments__form form" action="/comment-add.php" method="post">
                     <div class="comments__my-avatar">
-                      <img class="comments__picture" src="img/<?= $current_user['avatar'] ?>" alt="Аватар пользователя">
+                      <img class="comments__picture" src="img/<?= htmlspecialchars($current_user['avatar'] ?? '') ?>" alt="Аватар пользователя">
                     </div>
                     <div class="form__input-section<?= add_class($is_comment_add_error, 'form__input-section--error') ?>">
                       <input type="hidden" name="post-id" value="<?= $id ?>">
@@ -302,7 +307,11 @@ $comment_error = $comment_error ?? null;
                           class="user__avatar-link"
                           href="/profile.php?id=<?= $post['likes'][0]['user_id'] ?? '#' ?>"
                         >
-                          <img class="post-mini__picture user__picture" src="img/<?= $post['likes'][0]['avatar'] ?>" alt="Аватар пользователя">
+                          <img
+                            class="post-mini__picture user__picture"
+                            src="img/<?= htmlspecialchars($post['likes'][0]['avatar']) ?>"
+                            alt="Аватар пользователя"
+                          >
                         </a>
                       </div>
                       <div class="post-mini__name-wrapper user__name-wrapper">
@@ -310,7 +319,7 @@ $comment_error = $comment_error ?? null;
                           class="post-mini__name user__name"
                           href="/profile.php?id=<?= $post['likes'][0]['user_id'] ?? '#' ?>"
                         >
-                          <span><?= $post['likes'][0]['login'] ?></span>
+                          <span><?= htmlspecialchars($post['likes'][0]['login']) ?></span>
                         </a>
                         <div class="post-mini__action">
                           <span class="post-mini__activity user__additional">Лайкнул вашу публикацию</span>
@@ -383,12 +392,16 @@ $comment_error = $comment_error ?? null;
                     <div class="post-mini__user-info user__info">
                       <div class="post-mini__avatar user__avatar">
                         <a class="user__avatar-link" href="/profile.php?id=<?= $following['id'] ?? '' ?>">
-                          <img class="post-mini__picture user__picture" src="img/<?= $following['avatar'] ?? '' ?>" alt="Аватар пользователя">
+                          <img
+                            class="post-mini__picture user__picture"
+                            src="img/<?= htmlspecialchars($following['avatar'] ?? '') ?>"
+                            alt="Аватар пользователя"
+                          >
                         </a>
                       </div>
                       <div class="post-mini__name-wrapper user__name-wrapper">
                         <a class="post-mini__name user__name" href="/profile.php?id=<?= $following['id'] ?? '' ?>">
-                          <span><?= $following['login'] ?? '' ?></span>
+                          <span><?= htmlspecialchars($following['login'] ?? '') ?></span>
                         </a>
                         <time
                           class="post-mini__time user__additional"

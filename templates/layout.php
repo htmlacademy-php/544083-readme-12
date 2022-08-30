@@ -127,7 +127,7 @@ $unread_messages = $unread_messages ?? 0;
           <input
             class="header__search-input form__input"
             type="search" name="search"
-            value="<?= $_GET['search'] ?? '' ?>"
+            value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
           >
           <button class="header__search-button button" type="submit">
             <svg class="header__search-icon" width="18" height="18">
@@ -172,13 +172,13 @@ $unread_messages = $unread_messages ?? 0;
                   <div class="header__avatar-wrapper">
                     <img
                       class="header__profile-avatar"
-                      src="img/<?= $user['avatar'] ?? '' ?>"
+                      src="img/<?= htmlspecialchars($user['avatar'] ?? '') ?>"
                       alt="Аватар профиля"
                     >
                   </div>
                   <div class="header__profile-name">
                     <span>
-                      <?= $user['login'] ?? '' ?>
+                      <?= htmlspecialchars($user['login'] ?? '') ?>
                     </span>
                     <svg class="header__link-arrow" width="10" height="6">
                       <use xlink:href="#icon-arrow-right-ad"></use>
