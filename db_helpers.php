@@ -33,7 +33,7 @@ function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []): ?mysq
 {
   $stmt = mysqli_prepare($link, $sql);
 
-  if ($stmt === false) {
+  if (!$stmt) {
     if (IS_DEBUGGING) {
       $errorMsg = 'Не удалось инициализировать подготовленное выражение: ' . mysqli_error($link);
       die($errorMsg);
@@ -51,14 +51,14 @@ function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []): ?mysq
 
       if (is_int($value)) {
         $type = 'i';
-      } else {
-        if (is_string($value)) {
-          $type = 's';
-        } else {
-          if (is_double($value)) {
-            $type = 'd';
-          }
-        }
+      }
+
+      if (is_string($value)) {
+        $type = 's';
+      }
+
+      if (is_double($value)) {
+        $type = 'd';
       }
 
       $types .= $type;
