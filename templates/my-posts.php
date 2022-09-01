@@ -29,7 +29,7 @@ $tab = $tab ?? '';
             <li class="feed__filters-item filters__item">
               <a
                 class="filters__button<?= add_class($is_all_tab, 'filters__button--active') ?>"
-                href="<?= "?tab=all" ?>"
+                href="?tab=all"
               >
                 <span>Все</span>
               </a>

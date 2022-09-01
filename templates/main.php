@@ -71,7 +71,7 @@
               type="text"
               name="login"
               placeholder="Логин"
-              value="<?= $login_value ?? '' ?>"
+              value="<?= htmlspecialchars($login_value ?? '') ?>"
             >
             <svg class="form__input-icon" width="19" height="18">
               <use xlink:href="#icon-input-user"></use>
@@ -139,13 +139,13 @@
       <div class="footer__my-info">
         <ul class="footer__my-pages">
           <li class="footer__my-page footer__my-page--feed">
-            <a class="footer__page-link" href="feed.html">Моя лента</a>
+            <a class="footer__page-link" href="/feed.php">Моя лента</a>
           </li>
           <li class="footer__my-page footer__my-page--popular">
-            <a class="footer__page-link" href="popular.html">Популярный контент</a>
+            <a class="footer__page-link" href="/popular.php">Популярный контент</a>
           </li>
           <li class="footer__my-page footer__my-page--messages">
-            <a class="footer__page-link" href="messages.html">Личные сообщения</a>
+            <a class="footer__page-link" href="/messages.php">Личные сообщения</a>
           </li>
         </ul>
         <div class="footer__copyright">

@@ -21,7 +21,7 @@ $values = $values ?? [];
               id="photo-url"
               type="text"
               name="photo-url"
-              value="<?= $values['photo-url'] ?? '' ?>"
+              value="<?= htmlspecialchars($values['photo-url'] ?? '') ?>"
               placeholder="Введите ссылку"
             >
             <?php print(include_template('components/form/form-error.php', [

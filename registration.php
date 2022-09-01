@@ -27,34 +27,28 @@ if (count($_POST) > 0) {
       $sql_login = "SELECT login FROM users WHERE login = '$login'";
 
       $sql_email_res = mysqli_query($con, $sql_email);
+      include_server_error_page($sql_email_res);
 
-      if ($sql_email_res === false) {
-        include_server_error_page($sql_email_res);
-      } else {
-        if (count(mysqli_fetch_all($sql_email_res, MYSQLI_ASSOC)) > 0) {
-          $errors['email'] = [
-            'label' => 'Электронная почта',
-            'error' => 'Такой Email уже зарегестрирован'
-          ];
-        }
+      if (count(mysqli_fetch_all($sql_email_res, MYSQLI_ASSOC)) > 0) {
+        $errors['email'] = [
+          'label' => 'Электронная почта',
+          'error' => 'Такой Email уже зарегестрирован'
+        ];
       }
 
       $sql_login_res = mysqli_query($con, $sql_login);
+      include_server_error_page($sql_login_res);
 
-      if ($sql_login_res === false) {
-        include_server_error_page($sql_login_res);
-      } else {
-        if (count(mysqli_fetch_all($sql_login_res, MYSQLI_ASSOC)) > 0) {
-          $errors['login'] = [
-            'label' => 'Логин',
-            'error' => 'Такой логин уже зарегестрирован'
-          ];
-        }
+      if (count(mysqli_fetch_all($sql_login_res, MYSQLI_ASSOC)) > 0) {
+        $errors['login'] = [
+          'label' => 'Логин',
+          'error' => 'Такой логин уже зарегестрирован'
+        ];
       }
     }
   }
 
-  if (count($errors) !== 0) {
+  if (count($errors) > 0) {
     foreach($_POST as $key => $post) {
       $values[$key] = htmlspecialchars($post);
     }

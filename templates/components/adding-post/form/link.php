@@ -5,7 +5,7 @@ $values = $values ?? [];
 
 <section class="adding-post__link tabs__content tabs__content--active">
   <h2 class="visually-hidden">Форма добавления ссылки</h2>
-  <form class="adding-post__form form" action="/add.php" method="post" enctype="multipart/form-data">
+  <form class="adding-post__form form" action="/add.php" method="post">
     <input type="hidden" name="type" value="link">
     <div class="form__text-inputs-wrapper">
       <div class="form__text-inputs">
@@ -21,7 +21,7 @@ $values = $values ?? [];
               id="post-link"
               type="text"
               name="post-link"
-              value="<?= $values['post-link'] ?? '' ?>"
+              value="<?= htmlspecialchars($values['post-link'] ?? '') ?>"
               placeholder="Введите ссылку"
             >
             <?php print(include_template('components/form/form-error.php', [

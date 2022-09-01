@@ -16,23 +16,16 @@ CREATE TABLE users (
    dt_add TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX email_ix ON users(email);
-
 CREATE TABLE post_types (
    id INT AUTO_INCREMENT PRIMARY KEY,
    type VARCHAR (64) NOT NULL UNIQUE,
    name VARCHAR (64) NOT NULL UNIQUE
 );
 
-CREATE UNIQUE INDEX post_type_ix ON post_types(type);
-CREATE UNIQUE INDEX post_name_ix ON post_types(name);
-
 CREATE TABLE hashtags (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR (64) NOT NULL UNIQUE
 );
-
-CREATE UNIQUE INDEX hashtag_name_ix ON hashtags(name);
 
 CREATE TABLE posts (
    id INT AUTO_INCREMENT PRIMARY KEY,

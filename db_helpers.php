@@ -33,7 +33,7 @@ function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []): ?mysq
 {
   $stmt = mysqli_prepare($link, $sql);
 
-  if ($stmt === false) {
+  if (!$stmt) {
     if (IS_DEBUGGING) {
       $errorMsg = 'Не удалось инициализировать подготовленное выражение: ' . mysqli_error($link);
       die($errorMsg);
@@ -51,14 +51,14 @@ function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []): ?mysq
 
       if (is_int($value)) {
         $type = 'i';
-      } else {
-        if (is_string($value)) {
-          $type = 's';
-        } else {
-          if (is_double($value)) {
-            $type = 'd';
-          }
-        }
+      }
+
+      if (is_string($value)) {
+        $type = 's';
+      }
+
+      if (is_double($value)) {
+        $type = 'd';
       }
 
       $types .= $type;
@@ -136,7 +136,7 @@ function db_get_post_types(mysqli $link): ?array
  */
 function db_get_posts(
   mysqli $link,
-  int|string $tab,
+  string $tab,
   bool $is_all_tab,
   string $sort = null,
   array $user_ids = null,
@@ -183,12 +183,11 @@ function db_get_posts(
       p.author_id,
       pt.type,
       u.login AS author,
-      u.avatar
+      u.avatar,
+    (SELECT COUNT(post_id) FROM likes WHERE post_id = p.id) as likes_count
     FROM posts p
     JOIN users u ON p.author_id = u.id
     JOIN post_types pt ON pt.id = p.type_id
-    LEFT JOIN likes l ON l.post_id = p.id
-    LEFT JOIN comments c ON c.post_id = p.id
     $sql_filter
     GROUP BY p.id
     $sort

@@ -12,7 +12,7 @@ $class_name = $class_name ?? '';
   $link = htmlspecialchars($post['link']) ?? '';
   $image = htmlspecialchars($post['image']) ?? '';
   $avatar = htmlspecialchars($post['avatar']) ?? '';
-  $author = $post['author'] ?? '';
+  $author = htmlspecialchars($post['author'] ?? '');
   $author_id = $post['author_id'] ?? '';
   $id = $post['id'] ?? '';
   $dt_add = $post['dt_add'] ?? '';
@@ -91,11 +91,11 @@ $class_name = $class_name ?? '';
         <div class="post-link__wrapper">
           <a class="post-link__external" href="<?= $link ?>" title="Перейти по ссылке">
             <div class="post-link__icon-wrapper">
-              <img src="https://www.google.com/s2/favicons?domain=<?= $post['link'] ?>" alt="Иконка">
+              <img src="https://www.google.com/s2/favicons?domain=<?= $link ?>" alt="Иконка">
             </div>
             <div class="post-link__info">
               <h3><?= $title ?></h3>
-              <span><?= $post['link'] ?></span>
+              <span><?= $link ?></span>
             </div>
             <svg class="post-link__arrow" width="11" height="16">
               <use xlink:href="#icon-arrow-right-ad"></use>

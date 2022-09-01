@@ -25,7 +25,9 @@ $followings = [];
 if ($tab === 'likes') {
   $posts = array_filter(
     $posts,
-    static fn (array $item): bool => isset($item['likes']) && count($item['likes'] ?? []) > 0
+    function (array $item): bool {
+      return isset($item['likes']) && count($item['likes'] ?? []) > 0;
+    }
   );
 }
 

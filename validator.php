@@ -204,7 +204,7 @@ function validate_email_field (string $field, string $label): ?array
   if (empty($field)) {
     return [
       'label' => $label,
-      'error' => 'Поле долно быть заполненно'
+      'error' => 'Поле должно быть заполненно'
     ];
   }
 
@@ -235,7 +235,7 @@ function validate_repeat_password (string $main_field, string $field, string $la
   if (empty($field)) {
     return [
       'label' => $label,
-      'error' => 'Поле долно быть заполненно'
+      'error' => 'Поле должно быть заполненно'
     ];
   }
 
@@ -243,6 +243,32 @@ function validate_repeat_password (string $main_field, string $field, string $la
     return [
       'label' => $label,
       'error' => 'Пароли не совпадают'
+    ];
+  }
+
+  return null;
+}
+
+/**
+ * Валидирует поле с cсылкой
+ *
+ * @param string $field
+ * @param string $label
+ * @return ?array
+ */
+function validate_link_field (string $field, string $label): ?array
+{
+  if (empty($field)) {
+    return [
+      'label' => $label,
+      'error' => 'Поле должно быть заполненно'
+    ];
+  }
+
+  if (!filter_var($field, FILTER_VALIDATE_URL)) {
+    return [
+      'error' => 'Значение не является ссылкой',
+      'label' => $label,
     ];
   }
 
@@ -261,17 +287,32 @@ function get_errors_post_form (array $post, array $files): array
   $errors = [];
 
   $rules = [
-    'post-title' => fn() => validate_text_field($post['post-title'], 'Заголовок', true, 0, 128),
-    'cite-text' => fn() => validate_text_field($post['cite-text'], 'Текст цитаты', true, 0, 70),
-    'post-text' => fn() => validate_text_field($post['post-text'], 'Текст поста', true),
-    'quote-author' => fn() => validate_text_field($post['quote-author'], 'Автор', true, 0, 50),
-    'hash-tags' => fn() => validate_hash_tags($post['hash-tags'], 'Теги'),
-    'video-url' => fn() => validate_video_link($post['video-url'], 'Ссылка YOUTUBE'),
+    'post-title' => function ($post) {
+      return validate_text_field($post['post-title'], 'Заголовок', true, 0, 128);
+    },
+    'cite-text' => function ($post) {
+      return validate_text_field($post['cite-text'], 'Текст цитаты', true, 0, 70);
+    },
+    'post-text' => function ($post) {
+      return validate_text_field($post['post-text'], 'Текст поста', true);
+    },
+    'quote-author' => function ($post) {
+      return validate_text_field($post['quote-author'], 'Автор', true, 0, 50);
+    },
+    'hash-tags' => function ($post) {
+      return validate_hash_tags($post['hash-tags'], 'Теги');
+    },
+    'video-url' => function ($post) {
+      return validate_video_link($post['video-url'], 'Ссылка YOUTUBE');
+    },
+    'post-link' => function ($post) {
+      return validate_link_field($post['post-link'], 'Ссылка');
+    },
   ];
 
   foreach ($post as $key => $field) {
     if (isset($rules[$key])) {
-      $errors[$key] = $rules[$key]();
+      $errors[$key] = $rules[$key]($post);
     }
   }
 
@@ -308,15 +349,23 @@ function get_errors_join_form (array $post, array $file): array
   $errors = [];
 
   $rules = [
-    'email' => fn() => validate_email_field($post['email'], 'Электронная почта'),
-    'login' => fn() => validate_text_field($post['login'], 'Логин', true, 3, 32),
-    'password' => fn() => validate_text_field($post['password'], 'Пароль', true, 7, 64),
-    'password-repeat' => fn() => validate_repeat_password($post['password'], $post['password-repeat'], 'Повтор пароля'),
+    'email' => function ($post) {
+      return validate_email_field($post['email'], 'Электронная почта');
+    },
+    'login' => function ($post) {
+      return validate_text_field($post['login'], 'Логин', true, 3, 32);
+    },
+    'password' => function ($post) {
+      return validate_text_field($post['password'], 'Пароль', true, 7, 64);
+    },
+    'password-repeat' => function ($post) {
+      return validate_repeat_password($post['password'], $post['password-repeat'], 'Повтор пароля');
+    },
   ];
 
   foreach ($post as $key => $field) {
     if (isset($rules[$key])) {
-      $errors[$key] = $rules[$key]();
+      $errors[$key] = $rules[$key]($post);
     }
   }
 
@@ -336,13 +385,17 @@ function get_errors_login_form (array $post): array
   $errors = [];
 
   $rules = [
-    'login' => fn() => validate_text_field($post['login'], 'Логин', true),
-    'password' => fn() => validate_text_field($post['password'], 'Пароль', true),
+    'login' => function ($post) {
+      return validate_text_field($post['login'], 'Логин', true);
+    },
+    'password' => function ($post) {
+      return validate_text_field($post['password'], 'Пароль', true);
+    },
   ];
 
   foreach ($post as $key => $field) {
     if (isset($rules[$key])) {
-      $errors[$key] = $rules[$key]();
+      $errors[$key] = $rules[$key]($post);
     }
   }
 

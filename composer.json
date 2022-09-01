@@ -1,6 +1,6 @@
 {
-    "require": {
-      "symfony/mailer": "^6.0",
-      "ext-mysqli": "*"
-    }
+  "require": {
+    "symfony/mailer": "^4.4",
+    "ext-mysqli": "*"
+  }
 }

@@ -55,7 +55,7 @@ $next_page_link = $next_page_link ?? null;
           <li class="popular__filters-item popular__filters-item--all filters__item filters__item--all">
             <a
               class="filters__button filters__button--ellipse filters__button--all<?= ($is_all_tab ?? '') ? ' filters__button--active' : ''  ?>"
-              href="?sort=<?=$sort ?? ''?>"
+              href="?sort=<?= $sort ?? '' ?>"
             >
               <span>Все</span>
             </a>
@@ -100,7 +100,7 @@ $next_page_link = $next_page_link ?? null;
           $link = htmlspecialchars($post['link'] ?? '');
           $image = htmlspecialchars($post['image'] ?? '');
           $avatar = htmlspecialchars($post['avatar'] ?? '');
-          $author = $post['author'] ?? '';
+          $author = htmlspecialchars($post['author'] ?? '');
           $author_id = $post['author_id'] ?? '';
           $id = $post['id'] ?? '';
           $likes_count = count($post['likes'] ?? []);
