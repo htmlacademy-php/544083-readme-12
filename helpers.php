@@ -291,7 +291,7 @@ function relative_time(int $time): string {
 function include_not_found_page($isCorrect)
 {
   if (boolval($isCorrect) === false) {
-    print(include_template('error.php', ['is_not_found' => true]));
+    header("location: error.php");
     die;
   }
 }
@@ -302,7 +302,7 @@ function include_not_found_page($isCorrect)
 function include_server_error_page($isCorrect)
 {
   if (boolval($isCorrect) === false) {
-    print(include_template('error.php', ['is_not_found' => false]));
+    header("location: error.php?type=500");
     die;
   }
 }
