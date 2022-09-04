@@ -51,13 +51,9 @@ function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []): ?mysq
 
       if (is_int($value)) {
         $type = 'i';
-      }
-
-      if (is_string($value)) {
+      } elseif (is_string($value)) {
         $type = 's';
-      }
-
-      if (is_double($value)) {
+      } elseif (is_double($value)) {
         $type = 'd';
       }
 
