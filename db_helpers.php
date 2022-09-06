@@ -177,6 +177,7 @@ function db_get_posts(
       p.link,
       p.image,
       p.author_id,
+      p.video,
       pt.type,
       u.login AS author,
       u.avatar,
@@ -273,6 +274,7 @@ function db_get_post(mysqli $link, int $post_id): ?array
       p.image,
       p.views,
       p.author_id,
+      p.video,
       pt.type,
       (SELECT COUNT(post_id) FROM likes WHERE post_id = ?) as likes_count
     FROM posts p
