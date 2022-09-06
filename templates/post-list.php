@@ -99,6 +99,7 @@ $next_page_link = $next_page_link ?? null;
           $quote_author = htmlspecialchars($post['quote_author'] ?? '');
           $link = htmlspecialchars($post['link'] ?? '');
           $image = htmlspecialchars($post['image'] ?? '');
+          $video = htmlspecialchars($post['video'] ?? '');
           $avatar = htmlspecialchars($post['avatar'] ?? '');
           $author = htmlspecialchars($post['author'] ?? '');
           $author_id = $post['author_id'] ?? '';
@@ -143,6 +144,12 @@ $next_page_link = $next_page_link ?? null;
                       </div>
                       <span><?= $link ?></span>
                     </a>
+                  </div>
+                <?php elseif($type === 'video'): ?>
+                  <div class="post-video__block">
+                    <div class="post-video__preview">
+                      <?= embed_youtube_video($video); ?>
+                    </div>
                   </div>
                 <?php endif; ?>
               </div>
